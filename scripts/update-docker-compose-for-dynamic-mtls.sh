@@ -24,7 +24,7 @@ echo ""
 echo -e "${YELLOW}Creating backups...${NC}"
 cp docker-compose-hot.yml docker-compose-hot.yml.backup
 cp docker-compose-cold.yml docker-compose-cold.yml.backup
-echo -e "${GREEN}✓ Backups created${NC}"
+echo -e "${GREEN}[OK] Backups created${NC}"
 echo ""
 
 # Update hot blockchain docker-compose
@@ -41,7 +41,7 @@ sed -i 's|./hot-blockchain/crypto-config:/opt/gopath/src/github.com/hyperledger/
 sed -i 's|/peer/crypto/peerOrganizations|/peer/organizations/peerOrganizations|g' docker-compose-hot.yml
 sed -i 's|/peer/crypto/ordererOrganizations|/peer/organizations/ordererOrganizations|g' docker-compose-hot.yml
 
-echo -e "${GREEN}✓ Hot blockchain docker-compose updated${NC}"
+echo -e "${GREEN}[OK] Hot blockchain docker-compose updated${NC}"
 echo ""
 
 # Update cold blockchain docker-compose
@@ -58,11 +58,11 @@ sed -i 's|./cold-blockchain/crypto-config:/opt/gopath/src/github.com/hyperledger
 sed -i 's|/peer/crypto/peerOrganizations|/peer/organizations/peerOrganizations|g' docker-compose-cold.yml
 sed -i 's|/peer/crypto/ordererOrganizations|/peer/organizations/ordererOrganizations|g' docker-compose-cold.yml
 
-echo -e "${GREEN}✓ Cold blockchain docker-compose updated${NC}"
+echo -e "${GREEN}[OK] Cold blockchain docker-compose updated${NC}"
 echo ""
 
 echo -e "${GREEN}==========================================${NC}"
-echo -e "${GREEN}✓ Docker Compose files updated!${NC}"
+echo -e "${GREEN}[OK] Docker Compose files updated!${NC}"
 echo -e "${GREEN}==========================================${NC}"
 echo ""
 echo -e "${YELLOW}Changes made:${NC}"

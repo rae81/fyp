@@ -37,10 +37,10 @@ enroll_admin_in_container() {
         --tls.certfiles /etc/hyperledger/fabric-ca-server/ca-chain.pem"
 
     if [ $? -eq 0 ]; then
-        echo -e "  ${GREEN}✓ Admin enrolled${NC}"
+        echo -e "  ${GREEN}[OK] Admin enrolled${NC}"
         return 0
     else
-        echo -e "  ${RED}✗ Admin enrollment failed${NC}"
+        echo -e "  ${RED}[FAIL] Admin enrollment failed${NC}"
         return 1
     fi
 }
@@ -56,7 +56,7 @@ register_in_container() {
     # Ensure admin is enrolled first
     enroll_admin_in_container "$CONTAINER_NAME" "$CA_NAME" "$CA_PORT"
     if [ $? -ne 0 ]; then
-        echo -e "${RED}✗ Cannot register - admin enrollment failed${NC}"
+        echo -e "${RED}[FAIL] Cannot register - admin enrollment failed${NC}"
         return 1
     fi
 
@@ -73,9 +73,9 @@ register_in_container() {
         -u https://$CONTAINER_NAME:$CA_PORT"
 
     if [ $? -eq 0 ]; then
-        echo -e "${GREEN}✓ Registered $IDENTITY_NAME successfully${NC}"
+        echo -e "${GREEN}[OK] Registered $IDENTITY_NAME successfully${NC}"
     else
-        echo -e "${RED}✗ Failed to register $IDENTITY_NAME${NC}"
+        echo -e "${RED}[FAIL] Failed to register $IDENTITY_NAME${NC}"
         return 1
     fi
     echo ""

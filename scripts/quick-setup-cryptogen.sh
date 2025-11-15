@@ -27,7 +27,7 @@ cd "$PROJECT_ROOT"
 # Step 1: Stop all containers
 echo -e "${YELLOW}[1/7] Stopping all containers...${NC}"
 docker-compose -f docker-compose-hot.yml -f docker-compose-cold.yml down 2>/dev/null || true
-echo -e "${GREEN}✓ Containers stopped${NC}"
+echo -e "${GREEN}[OK] Containers stopped${NC}"
 echo ""
 
 # Step 2: Backup old organizations directory
@@ -35,7 +35,7 @@ echo -e "${YELLOW}[2/7] Backing up old organizations directory...${NC}"
 if [ -d "organizations" ]; then
     mv organizations organizations-backup-$(date +%s) 2>/dev/null || true
 fi
-echo -e "${GREEN}✓ Backup complete${NC}"
+echo -e "${GREEN}[OK] Backup complete${NC}"
 echo ""
 
 # Step 3: Generate crypto materials with cryptogen
@@ -44,14 +44,14 @@ echo -e "${YELLOW}[3/7] Generating crypto materials with cryptogen...${NC}"
 # Generate hot blockchain crypto
 echo "  Generating hot blockchain certificates..."
 cryptogen generate --config=hot-blockchain/crypto-config.yaml --output=organizations
-echo -e "${GREEN}  ✓ Hot blockchain crypto generated${NC}"
+echo -e "${GREEN}  [OK] Hot blockchain crypto generated${NC}"
 
 # Generate cold blockchain crypto
 echo "  Generating cold blockchain certificates..."
 cryptogen generate --config=cold-blockchain/crypto-config.yaml --output=organizations
-echo -e "${GREEN}  ✓ Cold blockchain crypto generated${NC}"
+echo -e "${GREEN}  [OK] Cold blockchain crypto generated${NC}"
 
-echo -e "${GREEN}✓ All crypto materials generated${NC}"
+echo -e "${GREEN}[OK] All crypto materials generated${NC}"
 echo ""
 
 # Step 4: Rename directories to match expected structure
@@ -67,7 +67,7 @@ mv organizations/ordererOrganizations/cold.coc.com organizations/ordererOrganiza
 mkdir -p organizations/ordererOrganizations/
 mv organizations/ordererOrganizations/cold.coc.com-temp organizations/ordererOrganizations/cold.coc.com 2>/dev/null || true
 
-echo -e "${GREEN}✓ Directories organized${NC}"
+echo -e "${GREEN}[OK] Directories organized${NC}"
 echo ""
 
 # Step 5: Generate channel artifacts
@@ -89,23 +89,23 @@ configtxgen -profile ColdChainGenesis -outputBlock ./channel-artifacts/coldchann
 echo "  Generating cold blockchain anchor peer updates..."
 configtxgen -profile ColdChainChannel -outputAnchorPeersUpdate ./channel-artifacts/AuditorMSPanchors.tx -channelID coldchannel -asOrg AuditorMSP
 
-echo -e "${GREEN}✓ Channel artifacts generated${NC}"
+echo -e "${GREEN}[OK] Channel artifacts generated${NC}"
 echo ""
 
 # Step 6: Start the network
 echo -e "${YELLOW}[6/7] Starting blockchain network...${NC}"
 docker-compose -f docker-compose-hot.yml -f docker-compose-cold.yml up -d
-echo -e "${GREEN}✓ Network started${NC}"
+echo -e "${GREEN}[OK] Network started${NC}"
 echo ""
 
 # Step 7: Wait for network to be ready
 echo -e "${YELLOW}[7/7] Waiting for network to stabilize...${NC}"
 sleep 15
-echo -e "${GREEN}✓ Network ready${NC}"
+echo -e "${GREEN}[OK] Network ready${NC}"
 echo ""
 
 echo -e "${GREEN}=========================================="
-echo "✓ Network Setup Complete!"
+echo "[OK] Network Setup Complete!"
 echo -e "==========================================${NC}"
 echo ""
 echo -e "${YELLOW}Next steps:${NC}"

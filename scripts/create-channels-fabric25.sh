@@ -28,14 +28,14 @@ wait_for_peer() {
     echo -e "${YELLOW}Waiting for $peer to be ready...${NC}"
     while [ $retry -lt $max_retry ]; do
         if docker exec cli peer node status &>/dev/null; then
-            echo -e "${GREEN}✓ $peer is ready${NC}"
+            echo -e "${GREEN}[OK] $peer is ready${NC}"
             return 0
         fi
         retry=$((retry + 1))
         sleep 2
     done
 
-    echo -e "${RED}✗ $peer failed to become ready${NC}"
+    echo -e "${RED}[FAIL] $peer failed to become ready${NC}"
     return 1
 }
 
@@ -53,13 +53,13 @@ docker exec cli osnadmin channel join \
     --ca-file /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/msp/tlscacerts/tlsca.hot.coc.com-cert.pem \
     --client-cert /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/tls/server.crt \
     --client-key /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/tls/server.key
-echo -e "${GREEN}✓ Hot orderer joined hotchannel${NC}"
+echo -e "${GREEN}[OK] Hot orderer joined hotchannel${NC}"
 echo ""
 
 # Wait for channel to be ready
 echo -e "${YELLOW}[3/8] Waiting for hotchannel to be ready...${NC}"
 sleep 5
-echo -e "${GREEN}✓ Channel ready${NC}"
+echo -e "${GREEN}[OK] Channel ready${NC}"
 echo ""
 
 # Fetch channel config block for peers
@@ -69,7 +69,7 @@ docker exec cli peer channel fetch 0 /tmp/hotchannel.block \
     -o orderer.hot.coc.com:7050 \
     --tls \
     --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/msp/tlscacerts/tlsca.hot.coc.com-cert.pem
-echo -e "${GREEN}✓ Genesis block fetched${NC}"
+echo -e "${GREEN}[OK] Genesis block fetched${NC}"
 echo ""
 
 # Join Law Enforcement peer to hotchannel
@@ -82,7 +82,7 @@ docker exec \
     -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/lawenforcement.hot.coc.com/users/Admin@lawenforcement.hot.coc.com/msp \
     -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/lawenforcement.hot.coc.com/peers/peer0.lawenforcement.hot.coc.com/tls/ca.crt \
     cli peer channel join -b /tmp/hotchannel.block || echo -e "${YELLOW}Peer already joined, continuing...${NC}"
-echo -e "${GREEN}✓ Law Enforcement peer joined hotchannel${NC}"
+echo -e "${GREEN}[OK] Law Enforcement peer joined hotchannel${NC}"
 echo ""
 
 # Join Forensic Lab peer to hotchannel
@@ -93,7 +93,7 @@ docker exec \
     -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/forensiclab.hot.coc.com/users/Admin@forensiclab.hot.coc.com/msp \
     -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/forensiclab.hot.coc.com/peers/peer0.forensiclab.hot.coc.com/tls/ca.crt \
     cli peer channel join -b /tmp/hotchannel.block || echo -e "${YELLOW}Peer already joined, continuing...${NC}"
-echo -e "${GREEN}✓ Forensic Lab peer joined hotchannel${NC}"
+echo -e "${GREEN}[OK] Forensic Lab peer joined hotchannel${NC}"
 echo ""
 
 # Join Cold Orderer to coldchannel
@@ -105,7 +105,7 @@ docker exec cli-cold osnadmin channel join \
     --ca-file /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/cold.coc.com/orderers/orderer.cold.coc.com/msp/tlscacerts/tlsca.cold.coc.com-cert.pem \
     --client-cert /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/cold.coc.com/orderers/orderer.cold.coc.com/tls/server.crt \
     --client-key /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/cold.coc.com/orderers/orderer.cold.coc.com/tls/server.key
-echo -e "${GREEN}✓ Cold orderer joined coldchannel${NC}"
+echo -e "${GREEN}[OK] Cold orderer joined coldchannel${NC}"
 echo ""
 
 # Wait and fetch cold channel block
@@ -124,7 +124,7 @@ docker exec \
     -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/archive.cold.coc.com/users/Admin@archive.cold.coc.com/msp \
     -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/archive.cold.coc.com/peers/peer0.archive.cold.coc.com/tls/ca.crt \
     cli-cold peer channel join -b /tmp/coldchannel.block || echo -e "${YELLOW}Peer already joined, continuing...${NC}"
-echo -e "${GREEN}✓ Archive peer joined coldchannel${NC}"
+echo -e "${GREEN}[OK] Archive peer joined coldchannel${NC}"
 echo ""
 
 # Verify channels
@@ -141,6 +141,6 @@ echo -e "${YELLOW}Cold blockchain channels:${NC}"
 docker exec cli-cold peer channel list
 
 echo ""
-echo -e "${GREEN}✓ All channels created and peers joined successfully${NC}"
+echo -e "${GREEN}[OK] All channels created and peers joined successfully${NC}"
 echo ""
 echo -e "${YELLOW}Next step: Deploy chaincode with ./deploy-chaincode.sh${NC}"

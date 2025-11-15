@@ -20,7 +20,7 @@ create_msp_config() {
 NodeOUs:
   Enable: false
 EOF
-    echo "  ✓ Created config.yaml for $ORG_NAME"
+    echo "  [OK] Created config.yaml for $ORG_NAME"
 }
 
 # Function to add admin certs to organization MSP
@@ -31,7 +31,7 @@ add_admin_certs() {
 
     mkdir -p "$ORG_MSP_DIR/admincerts"
     cp "$ADMIN_CERT_SOURCE" "$ORG_MSP_DIR/admincerts/"
-    echo "  ✓ Added admin cert for $ORG_NAME"
+    echo "  [OK] Added admin cert for $ORG_NAME"
 }
 
 echo ""
@@ -130,14 +130,14 @@ for USER_MSP in "$ORGS_DIR"/peerOrganizations/*/users/Admin@*/msp \
         if [ -f "$CERT_FILE" ]; then
             mkdir -p "$USER_MSP/admincerts"
             cp "$CERT_FILE" "$USER_MSP/admincerts/"
-            echo "  ✓ Added admincerts for admin user in $ORG_NAME"
+            echo "  [OK] Added admincerts for admin user in $ORG_NAME"
         fi
     fi
 done
 
 echo ""
 echo "==============================================="
-echo "✓ MSP Configuration Fixed"
+echo "[OK] MSP Configuration Fixed"
 echo "==============================================="
 echo ""
 echo "Next: Restart the blockchain network"

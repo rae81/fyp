@@ -16,13 +16,13 @@ cd "$PROJECT_ROOT"
 echo ""
 echo "[1/9] Stopping all blockchain containers..."
 docker-compose -f docker-compose-hot.yml -f docker-compose-cold.yml down 2>/dev/null || true
-echo "✓ Containers stopped"
+echo "[OK] Containers stopped"
 
 # Step 2: Start CA servers
 echo ""
 echo "[2/9] Starting CA servers..."
 docker-compose -f docker-compose-full.yml up -d ca-lawenforcement ca-forensiclab ca-auditor ca-court ca-orderer-hot ca-orderer-cold
-echo "✓ CA servers started"
+echo "[OK] CA servers started"
 echo "Waiting for CA servers to initialize..."
 sleep 10
 
@@ -35,20 +35,20 @@ rm -rf organizations/ordererOrganizations/*/msp
 rm -rf organizations/peerOrganizations/*/peers/*/msp
 rm -rf organizations/peerOrganizations/*/users/*/msp
 rm -rf organizations/peerOrganizations/*/msp
-echo "✓ Old MSPs removed"
+echo "[OK] Old MSPs removed"
 
 # Step 4: Re-enroll all identities
 echo ""
 echo "[4/9] Re-enrolling all identities with correct CA certificates..."
 ./scripts/enroll-all-identities.sh
-echo "✓ All identities re-enrolled"
+echo "[OK] All identities re-enrolled"
 
 # Step 5: Clean up unwanted CA certificates from enrollment
 echo ""
 echo "[5/9] Cleaning up unwanted CA certificates..."
 # Remove localhost-* files that contain root CA instead of intermediate CA
 find organizations -type f -name "localhost-*.pem" -delete
-echo "✓ Removed localhost CA certificate files"
+echo "[OK] Removed localhost CA certificate files"
 
 # Step 6: Update ALL MSP directories with correct CA certificates
 echo ""
@@ -101,13 +101,13 @@ update_msp_ca_certs "organizations/peerOrganizations/auditor.cold.coc.com/users/
 update_msp_ca_certs "organizations/peerOrganizations/court.coc.com/msp" "fabric-ca/court/ca-cert.pem"
 update_msp_ca_certs "organizations/peerOrganizations/court.coc.com/users/Admin@court.coc.com/msp" "fabric-ca/court/ca-cert.pem"
 
-echo "✓ All MSP CA certificates updated with correct SKI/AKI certs"
+echo "[OK] All MSP CA certificates updated with correct SKI/AKI certs"
 
 # Step 7: Apply MSP config fixes
 echo ""
 echo "[7/9] Applying MSP configuration (config.yaml and admincerts)..."
 ./scripts/fix-msp-config.sh
-echo "✓ MSP configuration applied"
+echo "[OK] MSP configuration applied"
 
 # Step 8: Regenerate channel artifacts
 echo ""
@@ -130,7 +130,7 @@ configtxgen -profile HotChainChannel -outputAnchorPeersUpdate ./channel-artifact
 export FABRIC_CFG_PATH="$PROJECT_ROOT/cold-blockchain"
 configtxgen -profile ColdChainChannel -outputAnchorPeersUpdate ./channel-artifacts/AuditorMSPanchors.tx -channelID coldchannel -asOrg AuditorMSP
 
-echo "✓ Channel artifacts and anchor peer transactions generated"
+echo "[OK] Channel artifacts and anchor peer transactions generated"
 
 # Step 9: Start the blockchain network
 echo ""
@@ -150,7 +150,7 @@ docker ps --format "table {{.Names}}\t{{.Status}}" | grep -E "(peer|orderer)"
 
 echo ""
 echo "╔════════════════════════════════════════════════════════════════╗"
-echo "║  ✓ MSP Rebuild Complete!                                      ║"
+echo "║  [OK] MSP Rebuild Complete!                                      ║"
 echo "╚════════════════════════════════════════════════════════════════╝"
 echo ""
 echo "Next steps:"

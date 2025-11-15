@@ -21,7 +21,7 @@ find organizations/ordererOrganizations -type d -name "intermediatecerts" -exec 
 echo "Removing intermediatecerts from peer MSPs..."
 find organizations/peerOrganizations -type d -name "intermediatecerts" -exec rm -rf {} + 2>/dev/null || true
 
-echo "✓ Intermediate cert directories removed"
+echo "[OK] Intermediate cert directories removed"
 
 echo ""
 echo "Restarting orderers and peers..."
@@ -33,5 +33,5 @@ sleep 10
 
 echo ""
 echo "==============================================="
-echo "✓ MSP Validation Chain Fixed"
+echo "[OK] MSP Validation Chain Fixed"
 echo "==============================================="

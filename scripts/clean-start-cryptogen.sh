@@ -29,7 +29,7 @@ cd "$PROJECT_ROOT"
 echo -e "${YELLOW}[1/8] Removing all containers, networks, and volumes...${NC}"
 docker-compose -f docker-compose-hot.yml -f docker-compose-cold.yml down -v --remove-orphans 2>/dev/null || true
 docker volume prune -f 2>/dev/null || true
-echo -e "${GREEN}✓ Docker cleaned${NC}"
+echo -e "${GREEN}[OK] Docker cleaned${NC}"
 echo ""
 
 # Step 2: Remove ALL old certificate directories
@@ -37,7 +37,7 @@ echo -e "${YELLOW}[2/8] Removing all old certificate and artifact directories...
 rm -rf organizations organizations-backup-* 2>/dev/null || true
 rm -rf channel-artifacts 2>/dev/null || true
 rm -rf fabric-ca 2>/dev/null || true
-echo -e "${GREEN}✓ Old directories removed${NC}"
+echo -e "${GREEN}[OK] Old directories removed${NC}"
 echo ""
 
 # Step 3: Create fresh organizations structure
@@ -45,7 +45,7 @@ echo -e "${YELLOW}[3/8] Creating fresh directory structure...${NC}"
 mkdir -p organizations/ordererOrganizations
 mkdir -p organizations/peerOrganizations
 mkdir -p channel-artifacts
-echo -e "${GREEN}✓ Fresh directories created${NC}"
+echo -e "${GREEN}[OK] Fresh directories created${NC}"
 echo ""
 
 # Step 4: Generate crypto materials with cryptogen
@@ -54,23 +54,23 @@ echo -e "${YELLOW}[4/8] Generating crypto materials with cryptogen...${NC}"
 # Generate hot blockchain crypto
 echo "  Generating hot blockchain certificates..."
 cryptogen generate --config=hot-blockchain/crypto-config.yaml --output=organizations
-echo -e "${GREEN}  ✓ Hot blockchain crypto generated${NC}"
+echo -e "${GREEN}  [OK] Hot blockchain crypto generated${NC}"
 
 # Generate cold blockchain crypto
 echo "  Generating cold blockchain certificates..."
 cryptogen generate --config=cold-blockchain/crypto-config.yaml --output=organizations
-echo -e "${GREEN}  ✓ Cold blockchain crypto generated${NC}"
+echo -e "${GREEN}  [OK] Cold blockchain crypto generated${NC}"
 
-echo -e "${GREEN}✓ All crypto materials generated with proper SKI/AKI${NC}"
+echo -e "${GREEN}[OK] All crypto materials generated with proper SKI/AKI${NC}"
 echo ""
 
 # Step 5: Verify certificates have SKI
 echo -e "${YELLOW}[5/8] Verifying certificates have SKI extension...${NC}"
 HOT_ORDERER_CA=$(find organizations/ordererOrganizations/hot.coc.com/msp/cacerts -type f -name "*.pem" | head -1)
 if openssl x509 -in "$HOT_ORDERER_CA" -noout -ext subjectKeyIdentifier 2>&1 | grep -q "X509v3 Subject Key Identifier"; then
-    echo -e "${GREEN}✓ Hot orderer CA has SKI extension${NC}"
+    echo -e "${GREEN}[OK] Hot orderer CA has SKI extension${NC}"
 else
-    echo -e "${RED}✗ Hot orderer CA missing SKI - cryptogen failed${NC}"
+    echo -e "${RED}[FAIL] Hot orderer CA missing SKI - cryptogen failed${NC}"
     exit 1
 fi
 echo ""
@@ -106,15 +106,15 @@ configtxgen -profile ColdChainChannel \
     -channelID coldchannel \
     -asOrg AuditorMSP
 
-echo -e "${GREEN}✓ Channel artifacts generated${NC}"
+echo -e "${GREEN}[OK] Channel artifacts generated${NC}"
 echo ""
 
 # Step 7: Verify genesis block contains good certificates
 echo -e "${YELLOW}[7/8] Verifying genesis block certificates...${NC}"
 if configtxblock=$(configtxlator proto_decode --input ./channel-artifacts/hotchannel.block --type common.Block 2>&1); then
-    echo -e "${GREEN}✓ Genesis block is valid${NC}"
+    echo -e "${GREEN}[OK] Genesis block is valid${NC}"
 else
-    echo -e "${RED}✗ Genesis block validation failed${NC}"
+    echo -e "${RED}[FAIL] Genesis block validation failed${NC}"
     exit 1
 fi
 echo ""
@@ -122,7 +122,7 @@ echo ""
 # Step 8: Start the network
 echo -e "${YELLOW}[8/8] Starting blockchain network...${NC}"
 docker-compose -f docker-compose-hot.yml -f docker-compose-cold.yml up -d
-echo -e "${GREEN}✓ Network started${NC}"
+echo -e "${GREEN}[OK] Network started${NC}"
 echo ""
 
 # Wait for network
@@ -133,20 +133,20 @@ echo ""
 # Verify orderers are running
 echo -e "${YELLOW}Verifying orderers are running...${NC}"
 if docker logs orderer.hot.coc.com 2>&1 | grep -q "Beginning to serve requests"; then
-    echo -e "${GREEN}✓ Hot orderer is serving requests${NC}"
+    echo -e "${GREEN}[OK] Hot orderer is serving requests${NC}"
 else
-    echo -e "${RED}✗ Hot orderer not ready - check logs: docker logs orderer.hot.coc.com${NC}"
+    echo -e "${RED}[FAIL] Hot orderer not ready - check logs: docker logs orderer.hot.coc.com${NC}"
 fi
 
 if docker logs orderer.cold.coc.com 2>&1 | grep -q "Beginning to serve requests"; then
-    echo -e "${GREEN}✓ Cold orderer is serving requests${NC}"
+    echo -e "${GREEN}[OK] Cold orderer is serving requests${NC}"
 else
-    echo -e "${RED}✗ Cold orderer not ready - check logs: docker logs orderer.cold.coc.com${NC}"
+    echo -e "${RED}[FAIL] Cold orderer not ready - check logs: docker logs orderer.cold.coc.com${NC}"
 fi
 echo ""
 
 echo -e "${GREEN}=========================================="
-echo "✓ Clean Setup Complete!"
+echo "[OK] Clean Setup Complete!"
 echo -e "==========================================${NC}"
 echo ""
 echo -e "${YELLOW}Network Status:${NC}"

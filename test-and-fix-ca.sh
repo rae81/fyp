@@ -23,7 +23,7 @@ until curl -s http://localhost:5001/health > /dev/null 2>&1; do
     echo "  Waiting for enclave..."
     sleep 2
 done
-echo "✓ Enclave is running"
+echo "[OK] Enclave is running"
 echo ""
 
 # Step 2: Initialize Root CA
@@ -57,7 +57,7 @@ CERT_RESPONSE=$(curl -s -X POST http://localhost:5001/ca/sign \
 # Save certificate
 echo "$CERT_RESPONSE" | python3 -c "import sys, json; print(json.load(sys.stdin)['certificate'])" > "$TEST_DIR/test-cert.pem"
 
-echo "✓ Certificate generated"
+echo "[OK] Certificate generated"
 echo ""
 
 # Step 4: Verify certificate
@@ -66,7 +66,7 @@ echo ""
 
 # Check if certificate exists
 if [ ! -f "$TEST_DIR/test-cert.pem" ]; then
-    echo "❌ Certificate file not generated!"
+    echo "[ERROR] Certificate file not generated!"
     exit 1
 fi
 
@@ -82,7 +82,7 @@ if openssl x509 -in "$TEST_DIR/test-cert.pem" -noout -text | grep -q "Certificat
     CA_CERT_OK=true
 else
     echo ""
-    echo "❌ Certificate is MISSING 'Certificate Sign' key usage - BUG FOUND!"
+    echo "[ERROR] Certificate is MISSING 'Certificate Sign' key usage - BUG FOUND!"
     echo ""
     echo "This is the issue causing Fabric CA to reject the certificates."
     echo ""
@@ -97,7 +97,7 @@ if [ "$CA_CERT_OK" = false ]; then
     echo "Checking enclave_sgx.py for certificate signing logic..."
     if grep -n "key_cert_sign.*True" enclave-simulator/enclave_sgx.py; then
         echo ""
-        echo "✓ Code shows key_cert_sign=True is set for intermediate certificates"
+        echo "[OK] Code shows key_cert_sign=True is set for intermediate certificates"
         echo ""
         echo "The bug might be:"
         echo "  1. Type parameter not being passed correctly"
@@ -106,7 +106,7 @@ if [ "$CA_CERT_OK" = false ]; then
         echo ""
     else
         echo ""
-        echo "❌ key_cert_sign=True NOT found in enclave_sgx.py!"
+        echo "[ERROR] key_cert_sign=True NOT found in enclave_sgx.py!"
         echo "This is the bug - the KeyUsage extension needs to be fixed."
         echo ""
     fi
@@ -141,7 +141,7 @@ for CA_DIR in fabric-ca/*/; do
         if openssl x509 -in "$CA_DIR/ca-cert.pem" -noout -text | grep -q "Certificate Sign"; then
             echo "✅ Valid (has cert sign)"
         else
-            echo "❌ Invalid (missing cert sign)"
+            echo "[ERROR] Invalid (missing cert sign)"
         fi
     fi
 done
@@ -158,7 +158,7 @@ if [ "$CA_CERT_OK" = true ]; then
     echo "  2. Wait 30 seconds for CAs to start"
     echo "  3. Run enrollment: ./scripts/enroll-all-identities.sh"
 else
-    echo "❌ Certificate generation has issues - see diagnostic output above"
+    echo "[ERROR] Certificate generation has issues - see diagnostic output above"
 fi
 
 # Cleanup

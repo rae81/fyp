@@ -96,7 +96,7 @@ docker exec \
     --ordererTLSHostnameOverride orderer.hot.coc.com \
     --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/msp/tlscacerts/tlsca.hot.coc.com-cert.pem
 
-echo -e "${GREEN}✓ CourtMSP added to hotchannel${NC}"
+echo -e "${GREEN}[OK] CourtMSP added to hotchannel${NC}"
 
 # ==============================================================================
 # ADD COURTMSP TO COLDCHANNEL
@@ -161,7 +161,7 @@ docker exec cli-cold peer channel update \
     --ordererTLSHostnameOverride orderer.cold.coc.com \
     --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/cold.coc.com/orderers/orderer.cold.coc.com/msp/tlscacerts/tlsca.cold.coc.com-cert.pem
 
-echo -e "${GREEN}✓ CourtMSP added to coldchannel${NC}"
+echo -e "${GREEN}[OK] CourtMSP added to coldchannel${NC}"
 
 echo -e "\n${GREEN}========================================${NC}"
 echo -e "${GREEN}CourtMSP successfully added to both channels!${NC}"

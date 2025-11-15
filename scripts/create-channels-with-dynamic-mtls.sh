@@ -33,21 +33,21 @@ wait_for_peer() {
     echo -e "${YELLOW}Waiting for $peer to be ready...${NC}"
     while [ $retry -lt $max_retry ]; do
         if docker exec cli peer node status &>/dev/null; then
-            echo -e "${GREEN}✓ $peer is ready${NC}"
+            echo -e "${GREEN}[OK] $peer is ready${NC}"
             return 0
         fi
         retry=$((retry + 1))
         sleep 2
     done
 
-    echo -e "${RED}✗ $peer failed to become ready${NC}"
+    echo -e "${RED}[FAIL] $peer failed to become ready${NC}"
     return 1
 }
 
 # Wait for containers
 echo -e "${YELLOW}[1/9] Checking if containers are ready...${NC}"
 if ! docker ps | grep -q "orderer.hot.coc.com"; then
-    echo -e "${RED}✗ Orderers not running! Please start containers first.${NC}"
+    echo -e "${RED}[FAIL] Orderers not running! Please start containers first.${NC}"
     echo -e "${YELLOW}Run: docker-compose -f docker-compose-hot.yml -f docker-compose-cold.yml up -d${NC}"
     exit 1
 fi
@@ -69,7 +69,7 @@ docker exec cli osnadmin channel join \
     --client-key /opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/tls/server.key
 
 if [ $? -eq 0 ]; then
-    echo -e "${GREEN}✓ Hot orderer joined hotchannel${NC}"
+    echo -e "${GREEN}[OK] Hot orderer joined hotchannel${NC}"
 else
     echo -e "${YELLOW}Note: Orderer may already be joined to channel${NC}"
 fi
@@ -78,7 +78,7 @@ echo ""
 # Wait for channel to be ready
 echo -e "${YELLOW}[3/9] Waiting for hotchannel to be ready...${NC}"
 sleep 5
-echo -e "${GREEN}✓ Channel ready${NC}"
+echo -e "${GREEN}[OK] Channel ready${NC}"
 echo ""
 
 # Fetch channel config block for peers
@@ -88,7 +88,7 @@ docker exec cli peer channel fetch 0 /tmp/hotchannel.block \
     -o orderer.hot.coc.com:7050 \
     --tls \
     --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/tls/ca.crt
-echo -e "${GREEN}✓ Genesis block fetched${NC}"
+echo -e "${GREEN}[OK] Genesis block fetched${NC}"
 echo ""
 
 # Join Law Enforcement peer to hotchannel
@@ -100,7 +100,7 @@ docker exec \
     -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/lawenforcement.hot.coc.com/users/Admin@lawenforcement.hot.coc.com/msp \
     -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/lawenforcement.hot.coc.com/peers/peer0.lawenforcement.hot.coc.com/tls/ca.crt \
     cli peer channel join -b /tmp/hotchannel.block || echo -e "${YELLOW}Peer already joined, continuing...${NC}"
-echo -e "${GREEN}✓ Law Enforcement peer joined hotchannel${NC}"
+echo -e "${GREEN}[OK] Law Enforcement peer joined hotchannel${NC}"
 echo ""
 
 # Join Forensic Lab peer to hotchannel
@@ -111,7 +111,7 @@ docker exec \
     -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/forensiclab.hot.coc.com/users/Admin@forensiclab.hot.coc.com/msp \
     -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/forensiclab.hot.coc.com/peers/peer0.forensiclab.hot.coc.com/tls/ca.crt \
     cli peer channel join -b /tmp/hotchannel.block || echo -e "${YELLOW}Peer already joined, continuing...${NC}"
-echo -e "${GREEN}✓ Forensic Lab peer joined hotchannel${NC}"
+echo -e "${GREEN}[OK] Forensic Lab peer joined hotchannel${NC}"
 echo ""
 
 # Update anchor peers for hot channel
@@ -143,7 +143,7 @@ docker exec \
     --tls \
     --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/tls/ca.crt || echo -e "${YELLOW}Anchor peer may already be set${NC}"
 
-echo -e "${GREEN}✓ Hot channel anchor peers updated${NC}"
+echo -e "${GREEN}[OK] Hot channel anchor peers updated${NC}"
 echo ""
 
 ###############################################################################
@@ -161,7 +161,7 @@ docker exec cli-cold osnadmin channel join \
     --client-key /opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/ordererOrganizations/cold.coc.com/orderers/orderer.cold.coc.com/tls/server.key
 
 if [ $? -eq 0 ]; then
-    echo -e "${GREEN}✓ Cold orderer joined coldchannel${NC}"
+    echo -e "${GREEN}[OK] Cold orderer joined coldchannel${NC}"
 else
     echo -e "${YELLOW}Note: Orderer may already be joined to channel${NC}"
 fi
@@ -183,7 +183,7 @@ docker exec \
     -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/auditor.cold.coc.com/users/Admin@auditor.cold.coc.com/msp \
     -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/auditor.cold.coc.com/peers/peer0.auditor.cold.coc.com/tls/ca.crt \
     cli-cold peer channel join -b /tmp/coldchannel.block || echo -e "${YELLOW}Peer already joined, continuing...${NC}"
-echo -e "${GREEN}✓ Auditor peer joined coldchannel${NC}"
+echo -e "${GREEN}[OK] Auditor peer joined coldchannel${NC}"
 echo ""
 
 # Update Auditor anchor peer
@@ -199,7 +199,7 @@ docker exec \
     --tls \
     --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/ordererOrganizations/cold.coc.com/orderers/orderer.cold.coc.com/tls/ca.crt || echo -e "${YELLOW}Anchor peer may already be set${NC}"
 
-echo -e "${GREEN}✓ Cold channel anchor peer updated${NC}"
+echo -e "${GREEN}[OK] Cold channel anchor peer updated${NC}"
 echo ""
 
 ###############################################################################
@@ -220,7 +220,7 @@ docker exec cli-cold peer channel list
 
 echo ""
 echo -e "${GREEN}==========================================${NC}"
-echo -e "${GREEN}✓ All channels created successfully!${NC}"
+echo -e "${GREEN}[OK] All channels created successfully!${NC}"
 echo -e "${GREEN}==========================================${NC}"
 echo ""
 echo -e "Certificate chain verified:"

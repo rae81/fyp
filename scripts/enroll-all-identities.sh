@@ -25,7 +25,7 @@ for CA in lawenforcement:7054 forensiclab:8054 auditor:9054 court:10054 orderer-
         echo "  Waiting for ca-$NAME..."
         sleep 2
     done
-    echo "✓ ca-$NAME is ready"
+    echo "[OK] ca-$NAME is ready"
 done
 
 echo ""
@@ -94,7 +94,7 @@ enroll_identity() {
         cp $(ls $ENROLL_DIR/tls/signcerts/* | head -1) $ENROLL_DIR/tls/server.crt 2>/dev/null || true
         cp $TLS_CERT $ENROLL_DIR/tls/ca.crt 2>/dev/null || true
 
-        echo "✓ Enrolled admin"
+        echo "[OK] Enrolled admin"
     else
         # Orderers/Peers: enroll with mTLS (registration done separately inside CA containers)
         # This workaround bypasses authentication issues while maintaining dynamic mTLS:
@@ -128,7 +128,7 @@ enroll_identity() {
         cp $(ls $ENROLL_DIR/tls/signcerts/* | head -1) $ENROLL_DIR/tls/server.crt 2>/dev/null || true
         cp $TLS_CERT $ENROLL_DIR/tls/ca.crt 2>/dev/null || true
 
-        echo "✓ Enrolled $IDENTITY_NAME"
+        echo "[OK] Enrolled $IDENTITY_NAME"
     fi
 }
 
@@ -169,7 +169,7 @@ mkdir -p "$FABRIC_CA_CLIENT_HOME/ordererOrganizations/cold.coc.com/msp/tlscacert
 cp "$FABRIC_CA_CLIENT_HOME/ordererOrganizations/cold.coc.com/users/Admin@cold.coc.com/msp/cacerts"/* \
    "$FABRIC_CA_CLIENT_HOME/ordererOrganizations/cold.coc.com/msp/tlscacerts/"
 
-echo "✓ Organization-level MSP directories created"
+echo "[OK] Organization-level MSP directories created"
 
 # ============================================================================
 # Enroll Peers
@@ -211,7 +211,7 @@ for ORG in lawenforcement.hot.coc.com forensiclab.hot.coc.com auditor.cold.coc.c
     cp -r "$ORG_DIR/users/Admin@$ORG/msp/cacerts" "$ORG_DIR/msp/"
     mkdir -p "$ORG_DIR/msp/tlscacerts"
     cp "$ORG_DIR/users/Admin@$ORG/msp/cacerts"/* "$ORG_DIR/msp/tlscacerts/"
-    echo "  ✓ Created MSP for $ORG"
+    echo "  [OK] Created MSP for $ORG"
 done
 
 # ============================================================================
@@ -273,7 +273,7 @@ done
 
 echo ""
 echo "==============================================================="
-echo "✓ All identities enrolled with dynamic mTLS certificates"
+echo "[OK] All identities enrolled with dynamic mTLS certificates"
 echo "==============================================================="
 echo ""
 echo "Certificate chain:"

@@ -26,7 +26,7 @@ docker-compose -f docker-compose-cold.yml down -v 2>/dev/null || true
 
 sudo rm -rf organizations/
 sudo rm -rf fabric-ca/*/fabric-ca-server.db
-echo -e "${GREEN}✓ Cleanup complete${NC}"
+echo -e "${GREEN}[OK] Cleanup complete${NC}"
 echo ""
 
 # Step 2: Test CA certificate generation
@@ -35,11 +35,11 @@ chmod +x test-and-fix-ca.sh
 ./test-and-fix-ca.sh
 
 if [ $? -ne 0 ]; then
-    echo -e "${RED}❌ CA certificate test failed!${NC}"
+    echo -e "${RED}[ERROR] CA certificate test failed!${NC}"
     echo -e "${YELLOW}The enclave may need to be rebuilt or there's a bug in certificate generation.${NC}"
     exit 1
 fi
-echo -e "${GREEN}✓ CA certificates tested and bootstrapped${NC}"
+echo -e "${GREEN}[OK] CA certificates tested and bootstrapped${NC}"
 echo ""
 
 # Step 3: Start CA servers
@@ -54,7 +54,7 @@ docker-compose -f docker-compose-full.yml up -d \
 
 echo "Waiting 60 seconds for CAs to fully initialize..."
 sleep 60
-echo -e "${GREEN}✓ CA servers started${NC}"
+echo -e "${GREEN}[OK] CA servers started${NC}"
 echo ""
 
 # Step 4: Verify CAs are running
@@ -63,56 +63,56 @@ ALL_CAS_OK=true
 for PORT in 7054 8054 9054 10054 11054 12054; do
   echo -n "  Port $PORT: "
   if curl -sk https://localhost:$PORT/cainfo 2>/dev/null | jq -r '.result.CAName' > /dev/null 2>&1; then
-    echo -e "${GREEN}✓ Running${NC}"
+    echo -e "${GREEN}[OK] Running${NC}"
   else
-    echo -e "${RED}✗ Not responding${NC}"
+    echo -e "${RED}[FAIL] Not responding${NC}"
     ALL_CAS_OK=false
   fi
 done
 
 if [ "$ALL_CAS_OK" = false ]; then
-    echo -e "${RED}❌ Some CA servers are not responding!${NC}"
+    echo -e "${RED}[ERROR] Some CA servers are not responding!${NC}"
     echo -e "${YELLOW}Check logs with: docker logs ca-lawenforcement${NC}"
     exit 1
 fi
-echo -e "${GREEN}✓ All CA servers verified${NC}"
+echo -e "${GREEN}[OK] All CA servers verified${NC}"
 echo ""
 
 # Step 5: Register identities
 echo -e "${YELLOW}[Step 5/10] Registering identities inside CA containers...${NC}"
 chmod +x scripts/register-identities-in-containers.sh
 ./scripts/register-identities-in-containers.sh
-echo -e "${GREEN}✓ Identities registered${NC}"
+echo -e "${GREEN}[OK] Identities registered${NC}"
 echo ""
 
 # Step 6: Enroll identities
 echo -e "${YELLOW}[Step 6/10] Enrolling identities to get certificates...${NC}"
 chmod +x scripts/enroll-all-identities.sh
 ./scripts/enroll-all-identities.sh
-echo -e "${GREEN}✓ Identities enrolled${NC}"
+echo -e "${GREEN}[OK] Identities enrolled${NC}"
 echo ""
 
 # Step 7: Verify organizations directory was created
 if [ ! -d "organizations/ordererOrganizations" ] || [ ! -d "organizations/peerOrganizations" ]; then
-    echo -e "${RED}❌ Organizations directory not created properly!${NC}"
+    echo -e "${RED}[ERROR] Organizations directory not created properly!${NC}"
     echo -e "${YELLOW}Enrollment may have failed. Check logs above.${NC}"
     exit 1
 fi
-echo -e "${GREEN}✓ Certificate structure verified${NC}"
+echo -e "${GREEN}[OK] Certificate structure verified${NC}"
 echo ""
 
 # Step 8: Generate channel artifacts
 echo -e "${YELLOW}[Step 7/10] Generating channel artifacts...${NC}"
 chmod +x scripts/regenerate-channel-artifacts.sh
 ./scripts/regenerate-channel-artifacts.sh
-echo -e "${GREEN}✓ Channel artifacts generated${NC}"
+echo -e "${GREEN}[OK] Channel artifacts generated${NC}"
 echo ""
 
 # Step 9: Update Docker Compose files
 echo -e "${YELLOW}[Step 8/10] Updating Docker Compose for dynamic mTLS...${NC}"
 chmod +x scripts/update-docker-compose-for-dynamic-mtls.sh
 ./scripts/update-docker-compose-for-dynamic-mtls.sh
-echo -e "${GREEN}✓ Docker Compose files updated${NC}"
+echo -e "${GREEN}[OK] Docker Compose files updated${NC}"
 echo ""
 
 # Step 10: Start blockchain network
@@ -121,7 +121,7 @@ docker-compose -f docker-compose-hot.yml -f docker-compose-cold.yml up -d
 
 echo "Waiting 90 seconds for network to stabilize..."
 sleep 90
-echo -e "${GREEN}✓ Blockchain network started${NC}"
+echo -e "${GREEN}[OK] Blockchain network started${NC}"
 echo ""
 
 # Step 11: Check if orderers need MSP fix
@@ -129,16 +129,16 @@ echo -e "${YELLOW}Verifying orderers...${NC}"
 ORDERERS_OK=true
 
 if docker ps | grep -q "orderer.hot.coc.com"; then
-    echo -e "${GREEN}✓ Hot orderer is running${NC}"
+    echo -e "${GREEN}[OK] Hot orderer is running${NC}"
 else
-    echo -e "✗ Hot orderer not running (may need MSP configuration)"
+    echo -e "[FAIL] Hot orderer not running (may need MSP configuration)"
     ORDERERS_OK=false
 fi
 
 if docker ps | grep -q "orderer.cold.coc.com"; then
-    echo -e "${GREEN}✓ Cold orderer is running${NC}"
+    echo -e "${GREEN}[OK] Cold orderer is running${NC}"
 else
-    echo -e "✗ Cold orderer not running (may need MSP configuration)"
+    echo -e "[FAIL] Cold orderer not running (may need MSP configuration)"
     ORDERERS_OK=false
 fi
 
@@ -150,11 +150,11 @@ if [ "$ORDERERS_OK" = false ]; then
 
     # Verify again after fix
     if ! docker ps | grep -q "orderer.hot.coc.com" || ! docker ps | grep -q "orderer.cold.coc.com"; then
-        echo -e "${RED}❌ Orderers still not running after MSP fix!${NC}"
+        echo -e "${RED}[ERROR] Orderers still not running after MSP fix!${NC}"
         echo "Check logs with: docker logs orderer.hot.coc.com"
         exit 1
     fi
-    echo -e "${GREEN}✓ All MSP configurations fixed and containers running${NC}"
+    echo -e "${GREEN}[OK] All MSP configurations fixed and containers running${NC}"
 fi
 echo ""
 
@@ -162,7 +162,7 @@ echo ""
 echo -e "${YELLOW}[Step 10/10] Creating channels...${NC}"
 chmod +x scripts/create-channels-with-dynamic-mtls.sh
 ./scripts/create-channels-with-dynamic-mtls.sh
-echo -e "${GREEN}✓ Channels created${NC}"
+echo -e "${GREEN}[OK] Channels created${NC}"
 echo ""
 
 # Final verification

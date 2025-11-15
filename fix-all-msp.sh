@@ -75,9 +75,9 @@ if [ -d "$HOT_ORDERER_MSP" ]; then
     mkdir -p "$HOT_ORDERER_MSP/admincerts"
     cp "organizations/ordererOrganizations/hot.coc.com/users/Admin@hot.coc.com/msp/signcerts/cert.pem" \
        "$HOT_ORDERER_MSP/admincerts/" 2>/dev/null || true
-    echo "  ✓ Hot orderer MSP configured"
+    echo "  [OK] Hot orderer MSP configured"
 else
-    echo "  ✗ Hot orderer MSP directory not found"
+    echo "  [FAIL] Hot orderer MSP directory not found"
 fi
 
 # Hot orderer - org-level MSP
@@ -89,7 +89,7 @@ if [ -d "$HOT_ORG_MSP" ]; then
     mkdir -p "$HOT_ORG_MSP/admincerts"
     cp "organizations/ordererOrganizations/hot.coc.com/users/Admin@hot.coc.com/msp/signcerts/cert.pem" \
        "$HOT_ORG_MSP/admincerts/" 2>/dev/null || true
-    echo "  ✓ Hot org-level MSP configured"
+    echo "  [OK] Hot org-level MSP configured"
 fi
 echo ""
 
@@ -104,7 +104,7 @@ if [ -d "$COLD_ORDERER_MSP" ]; then
     mkdir -p "$COLD_ORDERER_MSP/admincerts"
     cp "organizations/ordererOrganizations/cold.coc.com/users/Admin@cold.coc.com/msp/signcerts/cert.pem" \
        "$COLD_ORDERER_MSP/admincerts/" 2>/dev/null || true
-    echo "  ✓ Cold orderer MSP configured"
+    echo "  [OK] Cold orderer MSP configured"
 else
     echo "  ✗ Cold orderer MSP directory not found"
 fi
@@ -118,7 +118,7 @@ if [ -d "$COLD_ORG_MSP" ]; then
     mkdir -p "$COLD_ORG_MSP/admincerts"
     cp "organizations/ordererOrganizations/cold.coc.com/users/Admin@cold.coc.com/msp/signcerts/cert.pem" \
        "$COLD_ORG_MSP/admincerts/" 2>/dev/null || true
-    echo "  ✓ Cold org-level MSP configured"
+    echo "  [OK] Cold org-level MSP configured"
 fi
 echo ""
 
@@ -140,7 +140,7 @@ for MSP_DIR in \
         fi
     fi
 done
-echo "  ✓ LawEnforcement MSPs configured"
+echo "  [OK] LawEnforcement MSPs configured"
 
 # Forensic Lab
 for MSP_DIR in \
@@ -158,7 +158,7 @@ for MSP_DIR in \
         fi
     fi
 done
-echo "  ✓ ForensicLab MSPs configured"
+echo "  [OK] ForensicLab MSPs configured"
 
 # Auditor
 for MSP_DIR in \
@@ -176,7 +176,7 @@ for MSP_DIR in \
         fi
     fi
 done
-echo "  ✓ Auditor MSPs configured"
+echo "  [OK] Auditor MSPs configured"
 
 # Court (client-only org)
 for MSP_DIR in \
@@ -193,7 +193,7 @@ for MSP_DIR in \
         fi
     fi
 done
-echo "  ✓ Court MSPs configured"
+echo "  [OK] Court MSPs configured"
 echo ""
 
 echo -e "${YELLOW}[4/5] Restarting all containers...${NC}"
@@ -210,44 +210,44 @@ echo -e "${YELLOW}[5/5] Verifying containers...${NC}"
 ALL_OK=true
 
 if docker ps | grep -q "orderer.hot.coc.com"; then
-    echo -e "  ${GREEN}✓${NC} Hot orderer is running"
+    echo -e "  ${GREEN}[OK]${NC} Hot orderer is running"
 else
-    echo -e "  ${RED}✗${NC} Hot orderer not running"
+    echo -e "  ${RED}[FAIL]${NC} Hot orderer not running"
     ALL_OK=false
 fi
 
 if docker ps | grep -q "orderer.cold.coc.com"; then
-    echo -e "  ${GREEN}✓${NC} Cold orderer is running"
+    echo -e "  ${GREEN}[OK]${NC} Cold orderer is running"
 else
-    echo -e "  ${RED}✗${NC} Cold orderer not running"
+    echo -e "  ${RED}[FAIL]${NC} Cold orderer not running"
     ALL_OK=false
 fi
 
 if docker ps | grep -q "peer0.lawenforcement.hot.coc.com"; then
-    echo -e "  ${GREEN}✓${NC} Law Enforcement peer is running"
+    echo -e "  ${GREEN}[OK]${NC} Law Enforcement peer is running"
 else
-    echo -e "  ${RED}✗${NC} Law Enforcement peer not running"
+    echo -e "  ${RED}[FAIL]${NC} Law Enforcement peer not running"
     ALL_OK=false
 fi
 
 if docker ps | grep -q "peer0.forensiclab.hot.coc.com"; then
-    echo -e "  ${GREEN}✓${NC} Forensic Lab peer is running"
+    echo -e "  ${GREEN}[OK]${NC} Forensic Lab peer is running"
 else
-    echo -e "  ${RED}✗${NC} Forensic Lab peer not running"
+    echo -e "  ${RED}[FAIL]${NC} Forensic Lab peer not running"
     ALL_OK=false
 fi
 
 if docker ps | grep -q "peer0.auditor.cold.coc.com"; then
-    echo -e "  ${GREEN}✓${NC} Auditor peer is running"
+    echo -e "  ${GREEN}[OK]${NC} Auditor peer is running"
 else
-    echo -e "  ${RED}✗${NC} Auditor peer not running"
+    echo -e "  ${RED}[FAIL]${NC} Auditor peer not running"
     ALL_OK=false
 fi
 
 if docker ps | grep -q "cli"; then
-    echo -e "  ${GREEN}✓${NC} CLI container is running"
+    echo -e "  ${GREEN}[OK]${NC} CLI container is running"
 else
-    echo -e "  ${RED}✗${NC} CLI container not running"
+    echo -e "  ${RED}[FAIL]${NC} CLI container not running"
     ALL_OK=false
 fi
 

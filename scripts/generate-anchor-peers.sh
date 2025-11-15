@@ -23,7 +23,7 @@ configtxgen -profile HotChainChannel \
     -outputAnchorPeersUpdate ./channel-artifacts/LawEnforcementMSPanchors.tx \
     -channelID hotchannel \
     -asOrg LawEnforcementMSP
-echo "✓ LawEnforcementMSPanchors.tx created"
+echo "[OK] LawEnforcementMSPanchors.tx created"
 echo ""
 
 echo "[2/3] Generating Forensic Lab anchor peer transaction..."
@@ -31,7 +31,7 @@ configtxgen -profile HotChainChannel \
     -outputAnchorPeersUpdate ./channel-artifacts/ForensicLabMSPanchors.tx \
     -channelID hotchannel \
     -asOrg ForensicLabMSP
-echo "✓ ForensicLabMSPanchors.tx created"
+echo "[OK] ForensicLabMSPanchors.tx created"
 echo ""
 
 # Generate anchor peer transaction for COLD blockchain
@@ -41,11 +41,11 @@ configtxgen -profile ColdChainChannel \
     -outputAnchorPeersUpdate ./channel-artifacts/AuditorMSPanchors.tx \
     -channelID coldchannel \
     -asOrg AuditorMSP
-echo "✓ AuditorMSPanchors.tx created"
+echo "[OK] AuditorMSPanchors.tx created"
 echo ""
 
 echo "=========================================="
-echo "✓ All anchor peer transactions generated"
+echo "[OK] All anchor peer transactions generated"
 echo "=========================================="
 echo ""
 ls -lh channel-artifacts/*.tx

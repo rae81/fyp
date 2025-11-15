@@ -32,9 +32,9 @@ if ! curl -s http://localhost:5000/health > /dev/null 2>&1; then
 
     # Wait for enclave to start
     sleep 3
-    echo -e "${GREEN}✓ Enclave started (PID: $ENCLAVE_PID)${NC}"
+    echo -e "${GREEN}[OK] Enclave started (PID: $ENCLAVE_PID)${NC}"
 else
-    echo -e "${GREEN}✓ Enclave already running${NC}"
+    echo -e "${GREEN}[OK] Enclave already running${NC}"
 fi
 echo ""
 
@@ -59,7 +59,7 @@ seal_key() {
         }")
 
     if echo "$response" | grep -q "success"; then
-        echo -e "${GREEN}  ✓ Key sealed: $key_id${NC}"
+        echo -e "${GREEN}  [OK] Key sealed: $key_id${NC}"
 
         # Create backup of original key
         mkdir -p "$PROJECT_ROOT/sealed-keys-backup"
@@ -74,7 +74,7 @@ seal_key() {
 
         return 0
     else
-        echo -e "${RED}  ✗ Failed to seal key: $key_id${NC}"
+        echo -e "${RED}  [FAIL] Failed to seal key: $key_id${NC}"
         echo "  Response: $response"
         return 1
     fi
@@ -86,7 +86,7 @@ HOT_ORDERER_MSP_KEY=$(find organizations/ordererOrganizations/hot.coc.com/ordere
 if [ -f "$HOT_ORDERER_MSP_KEY" ]; then
     seal_key "$HOT_ORDERER_MSP_KEY" "hot-orderer-msp" "hot.coc.com"
 else
-    echo -e "${RED}✗ Hot orderer MSP key not found${NC}"
+    echo -e "${RED}[FAIL] Hot orderer MSP key not found${NC}"
 fi
 echo ""
 
@@ -95,7 +95,7 @@ HOT_ORDERER_TLS_KEY=$(find organizations/ordererOrganizations/hot.coc.com/ordere
 if [ -f "$HOT_ORDERER_TLS_KEY" ]; then
     seal_key "$HOT_ORDERER_TLS_KEY" "hot-orderer-tls" "hot.coc.com"
 else
-    echo -e "${RED}✗ Hot orderer TLS key not found${NC}"
+    echo -e "${RED}[FAIL] Hot orderer TLS key not found${NC}"
 fi
 echo ""
 
@@ -105,7 +105,7 @@ COLD_ORDERER_MSP_KEY=$(find organizations/ordererOrganizations/cold.coc.com/orde
 if [ -f "$COLD_ORDERER_MSP_KEY" ]; then
     seal_key "$COLD_ORDERER_MSP_KEY" "cold-orderer-msp" "cold.coc.com"
 else
-    echo -e "${RED}✗ Cold orderer MSP key not found${NC}"
+    echo -e "${RED}[FAIL] Cold orderer MSP key not found${NC}"
 fi
 echo ""
 
@@ -114,12 +114,12 @@ COLD_ORDERER_TLS_KEY=$(find organizations/ordererOrganizations/cold.coc.com/orde
 if [ -f "$COLD_ORDERER_TLS_KEY" ]; then
     seal_key "$COLD_ORDERER_TLS_KEY" "cold-orderer-tls" "cold.coc.com"
 else
-    echo -e "${RED}✗ Cold orderer TLS key not found${NC}"
+    echo -e "${RED}[FAIL] Cold orderer TLS key not found${NC}"
 fi
 echo ""
 
 echo -e "${GREEN}=========================================="
-echo "✓ Orderer Keys Sealed in Enclave"
+echo "[OK] Orderer Keys Sealed in Enclave"
 echo -e "==========================================${NC}"
 echo ""
 echo -e "${YELLOW}Sealed keys stored in enclave:${NC}"

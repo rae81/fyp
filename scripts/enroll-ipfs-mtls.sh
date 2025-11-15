@@ -27,12 +27,12 @@ until curl -sf "$ENCLAVE_URL/health" > /dev/null; do
     echo "  Enclave not ready, waiting..."
     sleep 2
 done
-echo "✓ Enclave service ready"
+echo "[OK] Enclave service ready"
 
 # Download Root CA certificate
 echo "Downloading Root CA certificate..."
 curl -s "$ENCLAVE_URL/ca/certificate" > "$IPFS_CERT_DIR/root-ca.pem"
-echo "✓ Root CA downloaded"
+echo "[OK] Root CA downloaded"
 
 # ============================================================================
 # Function to generate IPFS node certificate
@@ -75,7 +75,7 @@ generate_ipfs_cert() {
     chmod 644 "$CERT_DIR/ipfs-cert.pem"
     chmod 644 "$CERT_DIR/ipfs-chain.pem"
 
-    echo "  ✓ Certificate generated for IPFS $NODE_NAME"
+    echo "  [OK] Certificate generated for IPFS $NODE_NAME"
     echo "    - Private Key:  $CERT_DIR/ipfs-key.pem"
     echo "    - Certificate:  $CERT_DIR/ipfs-cert.pem"
     echo "    - Chain:        $CERT_DIR/ipfs-chain.pem"
@@ -90,7 +90,7 @@ generate_ipfs_cert "cold" "ipfs.cold.coc.com"
 
 echo ""
 echo "================================================================"
-echo "✓ IPFS mTLS Certificate Enrollment Complete"
+echo "[OK] IPFS mTLS Certificate Enrollment Complete"
 echo "================================================================"
 echo ""
 echo "Certificate Storage:"
