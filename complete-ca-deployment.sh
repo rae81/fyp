@@ -124,22 +124,37 @@ sleep 90
 echo -e "${GREEN}✓ Blockchain network started${NC}"
 echo ""
 
-# Step 11: Verify orderers are running
+# Step 11: Check if orderers need MSP fix
 echo -e "${YELLOW}Verifying orderers...${NC}"
+ORDERERS_OK=true
+
 if docker ps | grep -q "orderer.hot.coc.com"; then
     echo -e "${GREEN}✓ Hot orderer is running${NC}"
 else
-    echo -e "${RED}✗ Hot orderer not running${NC}"
-    echo "Hot orderer logs:"
-    docker logs orderer.hot.coc.com 2>&1 | tail -30
+    echo -e "✗ Hot orderer not running (may need MSP configuration)"
+    ORDERERS_OK=false
 fi
 
 if docker ps | grep -q "orderer.cold.coc.com"; then
     echo -e "${GREEN}✓ Cold orderer is running${NC}"
 else
-    echo -e "${RED}✗ Cold orderer not running${NC}"
-    echo "Cold orderer logs:"
-    docker logs orderer.cold.coc.com 2>&1 | tail -30
+    echo -e "✗ Cold orderer not running (may need MSP configuration)"
+    ORDERERS_OK=false
+fi
+
+if [ "$ORDERERS_OK" = false ]; then
+    echo ""
+    echo -e "${YELLOW}[Step 9.5/10] Fixing orderer MSP configuration...${NC}"
+    chmod +x fix-orderer-msp.sh
+    ./fix-orderer-msp.sh
+
+    # Verify again after fix
+    if ! docker ps | grep -q "orderer.hot.coc.com" || ! docker ps | grep -q "orderer.cold.coc.com"; then
+        echo -e "${RED}❌ Orderers still not running after MSP fix!${NC}"
+        echo "Check logs with: docker logs orderer.hot.coc.com"
+        exit 1
+    fi
+    echo -e "${GREEN}✓ Orderers fixed and running${NC}"
 fi
 echo ""
 
