@@ -1,11 +1,12 @@
-version: '3.7'
-
 # COLD BLOCKCHAIN - Stores immutable evidence records
 # Based on AUB Project 68 specifications
 
 networks:
   cold-chain-network:
     name: cold-chain-network
+  coc-network:
+    external: true
+    name: coc-network
 
 services:
   # Orderer Service
@@ -51,10 +52,11 @@ services:
       - 8543:8543
     networks:
       - cold-chain-network
+      - coc-network
 
-  # Peer0 - Archive Organization
-  peer0.archive.cold.coc.com:
-    container_name: peer0.archive.cold.coc.com
+  # Peer0 - Auditor Organization
+  peer0.auditor.cold.coc.com:
+    container_name: peer0.auditor.cold.coc.com
     image: hyperledger/fabric-peer:2.5
     environment:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
@@ -65,19 +67,22 @@ services:
       - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
       - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
-      - CORE_PEER_ID=peer0.archive.cold.coc.com
-      - CORE_PEER_ADDRESS=peer0.archive.cold.coc.com:9051
+      - CORE_PEER_ID=peer0.auditor.cold.coc.com
+      - CORE_PEER_ADDRESS=peer0.auditor.cold.coc.com:9051
       - CORE_PEER_LISTENADDRESS=0.0.0.0:9051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.archive.cold.coc.com:9052
+      - CORE_PEER_CHAINCODEADDRESS=peer0.auditor.cold.coc.com:9052
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9052
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.archive.cold.coc.com:9051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.archive.cold.coc.com:9051
-      - CORE_PEER_LOCALMSPID=ArchiveMSP
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.auditor.cold.coc.com:9051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.auditor.cold.coc.com:9051
+      - CORE_PEER_LOCALMSPID=AuditorMSP
       - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
       - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:9543
       - CORE_METRICS_PROVIDER=prometheus
-      - CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer0archive"}
-      - CORE_CHAINCODE_EXECUTETIMEOUT=300s
+      - CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer0auditor"}
+      - CORE_CHAINCODE_EXECUTETIMEOUT=900s
+      - CORE_CHAINCODE_STARTUPTIMEOUT=900s
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_CHAINCODE_LOGGING_LEVEL=INFO
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
       - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb2:5984
       - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=admin
@@ -86,17 +91,19 @@ services:
     command: peer node start
     volumes:
       - /var/run/docker.sock:/host/var/run/docker.sock
-      - ./cold-blockchain/crypto-config/peerOrganizations/archive.cold.coc.com/peers/peer0.archive.cold.coc.com:/etc/hyperledger/fabric
-      - peer0.archive.cold.coc.com:/var/hyperledger/production
+      - ./cold-blockchain/crypto-config/peerOrganizations/auditor.cold.coc.com/peers/peer0.auditor.cold.coc.com:/etc/hyperledger/fabric
+      - peer0.auditor.cold.coc.com:/var/hyperledger/production
     ports:
       - 9051:9051
       - 9543:9543
     depends_on:
-      - couchdb2
+      couchdb2:
+        condition: service_healthy
     networks:
       - cold-chain-network
+      - coc-network
 
-  # CouchDB for Archive Peer
+  # CouchDB for Auditor Peer
   couchdb2:
     container_name: couchdb2
     image: couchdb:3.3.2
@@ -107,6 +114,12 @@ services:
       - 7984:5984
     networks:
       - cold-chain-network
+      - coc-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5984/_up"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # CLI tool for cold chain operations
   cli-cold:
@@ -119,13 +132,13 @@ services:
       - FABRIC_LOGGING_SPEC=INFO
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - CORE_PEER_ID=cli-cold
-      - CORE_PEER_ADDRESS=peer0.archive.cold.coc.com:9051
-      - CORE_PEER_LOCALMSPID=ArchiveMSP
+      - CORE_PEER_ADDRESS=peer0.auditor.cold.coc.com:9051
+      - CORE_PEER_LOCALMSPID=AuditorMSP
       - CORE_PEER_TLS_ENABLED=true
-      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/archive.cold.coc.com/peers/peer0.archive.cold.coc.com/tls/server.crt
-      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/archive.cold.coc.com/peers/peer0.archive.cold.coc.com/tls/server.key
-      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/archive.cold.coc.com/peers/peer0.archive.cold.coc.com/tls/ca.crt
-      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/archive.cold.coc.com/users/Admin@archive.cold.coc.com/msp
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/auditor.cold.coc.com/peers/peer0.auditor.cold.coc.com/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/auditor.cold.coc.com/peers/peer0.auditor.cold.coc.com/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/auditor.cold.coc.com/peers/peer0.auditor.cold.coc.com/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/auditor.cold.coc.com/users/Admin@auditor.cold.coc.com/msp
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: /bin/bash
     volumes:
@@ -135,10 +148,11 @@ services:
       - ./cold-blockchain/scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
       - ./cold-blockchain/channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
     depends_on:
-      - peer0.archive.cold.coc.com
+      - peer0.auditor.cold.coc.com
     networks:
       - cold-chain-network
+      - coc-network
 
 volumes:
   orderer.cold.coc.com:
-  peer0.archive.cold.coc.com:
+  peer0.auditor.cold.coc.com:

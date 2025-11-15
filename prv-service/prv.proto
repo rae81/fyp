@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package dfir.prv;
+
+option go_package = "./;main";
+
+// PRV Service - Policy evaluation and permit signing in simulated enclave
+service PRV {
+  rpc InitPRV(InitRequest) returns (stream InitResponse);
+  rpc EvaluatePolicy(PolicyRequest) returns (stream PolicyResponse);
+  rpc GetSignedPermit(PermitRequest) returns (stream PermitResponse);
+  rpc GetAttestation(AttestationRequest) returns (stream AttestationResponse);
+  rpc GetPublicKey(PublicKeyRequest) returns (stream PublicKeyResponse);
+}
+
+// Role assignment for a user
+message RoleAssignment {
+  string user_id = 1;      // User identifier
+  string role = 2;         // admin, investigator, auditor, court
+  uint32 clearance = 3;    // Clearance level 1-4
+}
+
+// Initialize PRV with user role assignments
+message InitRequest {
+  repeated RoleAssignment roles = 1;
+}
+
+message InitResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Policy evaluation request
+message PolicyRequest {
+  string subject = 1;      // User ID
+  string action = 2;       // create, read, transfer, update, delete
+  string resource = 3;     // evidence/001, case/2024-001
+  uint32 clearance = 4;    // User's clearance level
+}
+
+message PolicyResponse {
+  bool allow = 1;          // Policy decision
+  string reason = 2;       // Explanation
+}
+
+// Request for signed permit
+message PermitRequest {
+  string subject = 1;
+  string action = 2;
+  string resource = 3;
+  uint32 clearance = 4;
+  bool allow = 5;          // Policy decision to sign
+  bytes nonce = 6;         // Unique nonce for replay protection
+}
+
+// JWS-formatted permit
+message JWSPermit {
+  string header = 1;       // Base64URL encoded header
+  string payload = 2;      // Base64URL encoded payload
+  bytes signature = 3;     // ECDSA signature (R||S format, 64 bytes)
+}
+
+// Attestation report (simulated)
+message AttestationReport {
+  bytes mrenclave = 1;     // Measurement of enclave code (32 bytes)
+  bytes mrsigner = 2;      // Measurement of enclave signer (32 bytes)
+  uint64 timestamp = 3;    // Attestation timestamp
+  bytes nonce = 4;         // Challenge nonce
+  bytes signature = 5;     // Platform signature (64 bytes)
+}
+
+// Response with signed permit and attestation
+message PermitResponse {
+  JWSPermit permit = 1;
+  AttestationReport attestation = 2;
+}
+
+// Request attestation report
+message AttestationRequest {
+  bytes challenge = 1;     // Challenge nonce
+}
+
+message AttestationResponse {
+  AttestationReport attestation = 1;
+}
+
+// Request public key for chaincode verification
+message PublicKeyRequest {}
+
+message PublicKeyResponse {
+  bytes public_key = 1;    // Uncompressed ECDSA P-256 public key (65 bytes)
+  string key_type = 2;     // "ES256"
+}

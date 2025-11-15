@@ -13,23 +13,27 @@ NC='\033[0m'
 # 1. Set environment
 export PATH="$PWD/fabric-samples/bin:$PATH"
 
-# 2. Start Storage Services (IPFS + MySQL)
+# 2. Create shared Docker network
+echo -e "${YELLOW}Creating shared Docker network...${NC}"
+docker network create coc-network 2>/dev/null || echo "Network already exists"
+
+# 3. Start Storage Services (IPFS + MySQL)
 echo -e "${YELLOW}Starting Storage Services...${NC}"
 docker-compose -f docker-compose-storage.yml up -d
 echo "Waiting for services to initialize..."
 sleep 10
 
-# 3. Start Hot Blockchain
+# 4. Start Hot Blockchain
 echo -e "${YELLOW}Starting Hot Blockchain...${NC}"
 docker-compose -f docker-compose-hot.yml up -d
 sleep 15
 
-# 4. Start Cold Blockchain
+# 5. Start Cold Blockchain
 echo -e "${YELLOW}Starting Cold Blockchain...${NC}"
 docker-compose -f docker-compose-cold.yml up -d
 sleep 15
 
-# 5. Join channels (in case they disconnected)
+# 6. Join channels (in case they disconnected)
 echo -e "${YELLOW}Ensuring channels are joined...${NC}"
 
 # Copy channel blocks
@@ -48,22 +52,27 @@ docker exec \
 # Join Cold channel
 docker exec cli-cold peer channel join -b coldchannel.block 2>/dev/null || echo "Archive already joined"
 
-# 6. Configure IPFS for WebUI
+# 7. Configure IPFS for WebUI
 echo -e "${YELLOW}Configuring IPFS WebUI...${NC}"
 docker exec ipfs-node ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin '["https://webui.ipfs.io", "*"]' 2>/dev/null
 docker restart ipfs-node
 sleep 5
 
-# 7. Start Flask Web Application
+# 8. Start Flask Web Application (optional - skip if port 5000 in use)
 echo -e "${YELLOW}Starting Web Dashboard...${NC}"
-cd webapp
-nohup python3 app.py > flask.log 2>&1 &
-cd ..
+if lsof -Pi :5000 -sTCP:LISTEN -t >/dev/null 2>&1 ; then
+    echo "⚠️  Port 5000 is in use. Skipping webapp start."
+    echo "   To start manually: cd webapp && python3 app_blockchain.py"
+else
+    cd webapp
+    nohup python3 app_blockchain.py > flask.log 2>&1 &
+    cd ..
+fi
 
-# 8. Wait and verify
+# 9. Wait and verify
 sleep 5
 
-# 9. Status check
+# 10. Status check
 echo ""
 echo -e "${GREEN}==========================================${NC}"
 echo -e "${GREEN}   System Started Successfully!${NC}"

@@ -1,31 +1,51 @@
-version: '3.7'
-
 # IPFS & MySQL Configuration
 # Supporting components for Hot & Cold Blockchain System
 
 networks:
   storage-network:
     name: storage-network
+  coc-network:
+    external: true
+    name: coc-network
 
 services:
-  # IPFS Node - Distributed Evidence Storage
+  # IPFS Node - Distributed Evidence Storage (internal only)
   ipfs:
     container_name: ipfs-node
     image: ipfs/kubo:latest
     environment:
       - IPFS_PROFILE=server
       - IPFS_PATH=/data/ipfs
+    expose:
+      - "5001"     # API (internal only - accessed via nginx)
+      - "8080"     # Gateway (internal only - accessed via nginx)
     ports:
-      - "4001:4001"     # P2P TCP
-      - "4001:4001/udp" # P2P UDP
-      - "5001:5001"     # API
-      - "8080:8080"     # Gateway
+      - "4001:4001"     # P2P TCP (public)
+      - "4001:4001/udp" # P2P UDP (public)
     volumes:
       - ipfs-data:/data/ipfs
       - ./shared/ipfs/export:/export
       - ./shared/ipfs/staging:/staging
     networks:
       - storage-network
+      - coc-network
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy for IPFS with mTLS
+  ipfs-proxy:
+    container_name: ipfs-proxy
+    image: nginx:alpine
+    ports:
+      - "5443:5443"     # IPFS API with mTLS
+      - "8444:8443"     # IPFS Gateway with mTLS (mapped to 8444 to avoid conflict)
+    volumes:
+      - ./config/nginx-ipfs.conf:/etc/nginx/nginx.conf:ro
+      - ./organizations/services/ipfs/tls:/etc/nginx/certs:ro
+    depends_on:
+      - ipfs
+    networks:
+      - storage-network
+      - coc-network
     restart: unless-stopped
 
   # MySQL Database - Off-chain Evidence Metadata
@@ -44,8 +64,9 @@ services:
       - ./shared/database/init:/docker-entrypoint-initdb.d
     networks:
       - storage-network
+      - coc-network
     restart: unless-stopped
-    command: --default-authentication-plugin=mysql_native_password
+    command: --default-authentication-plugin=mysql_native_password --skip-ssl
 
   # phpMyAdmin - Database Management UI
   phpmyadmin:
@@ -62,6 +83,7 @@ services:
       - mysql
     networks:
       - storage-network
+      - coc-network
     restart: unless-stopped
 
 volumes:

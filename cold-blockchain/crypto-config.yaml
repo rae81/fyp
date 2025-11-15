@@ -7,12 +7,20 @@ OrdererOrgs:
     EnableNodeOUs: true
     Specs:
       - Hostname: orderer
-    
+
 PeerOrgs:
-  - Name: Archive
-    Domain: archive.cold.coc.com
+  - Name: Auditor
+    Domain: auditor.cold.coc.com
     EnableNodeOUs: true
     Template:
       Count: 1
     Users:
       Count: 2
+
+  - Name: Court
+    Domain: court.cold.coc.com
+    EnableNodeOUs: true
+    Template:
+      Count: 1  # Generate peer certs (we'll use admin/user certs only)
+    Users:
+      Count: 3  # Court admins and users

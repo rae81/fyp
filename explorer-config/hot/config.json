@@ -1,0 +1,14 @@
+{
+  "network-configs": {
+    "hot-network": {
+      "name": "Hot Blockchain Network",
+      "profile": "./connection-profile/hot-network.json"
+    }
+  },
+  "license": "Apache-2.0",
+  "sync": {
+    "type": "local",
+    "platform": "fabric",
+    "blocksSyncTime": "3"
+  }
+}

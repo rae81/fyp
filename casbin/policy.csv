@@ -1,0 +1,131 @@
+# Casbin Policy for Blockchain DFIR System
+# Format: p, role, object, action, resource
+# Based on JumpServer RBAC: (app.model, action, resource)
+
+# ==============================================================================
+# SYSTEMADMIN ROLE - Full access to everything (including PKI)
+# ==============================================================================
+p, SystemAdmin, *, *, *
+
+# ==============================================================================
+# BLOCKCHAININVESTIGATOR ROLE - Evidence Management & Investigation
+# ==============================================================================
+# Investigation management
+p, BlockchainInvestigator, blockchain.investigation, create, *
+p, BlockchainInvestigator, blockchain.investigation, view, *
+p, BlockchainInvestigator, blockchain.investigation, update, *
+p, BlockchainInvestigator, blockchain.investigation, list, *
+
+# Evidence management
+p, BlockchainInvestigator, blockchain.evidence, create, *
+p, BlockchainInvestigator, blockchain.evidence, view, *
+p, BlockchainInvestigator, blockchain.evidence, update, *
+p, BlockchainInvestigator, blockchain.evidence, transfer, *
+p, BlockchainInvestigator, blockchain.evidence, list, *
+
+# Custody chain
+p, BlockchainInvestigator, blockchain.custody, transfer, *
+p, BlockchainInvestigator, blockchain.custody, view, *
+
+# Blockchain transactions
+p, BlockchainInvestigator, blockchain.transaction, create, *
+p, BlockchainInvestigator, blockchain.transaction, view, *
+p, BlockchainInvestigator, blockchain.transaction, append, hot
+p, BlockchainInvestigator, blockchain.transaction, append, cold
+
+# Case management
+p, BlockchainInvestigator, blockchain.case, create, *
+p, BlockchainInvestigator, blockchain.case, view, *
+p, BlockchainInvestigator, blockchain.case, update, *
+
+# Audit logs (own actions only)
+p, BlockchainInvestigator, audits.userloginlog, view, self
+p, BlockchainInvestigator, audits.operatelog, view, self
+
+# PKI (view own certificate)
+p, BlockchainInvestigator, pki.certificate, view, self
+
+# ==============================================================================
+# BLOCKCHAINAUDITOR ROLE - Read-only access + full audit capabilities
+# ==============================================================================
+# Investigation (read-only)
+p, BlockchainAuditor, blockchain.investigation, view, *
+p, BlockchainAuditor, blockchain.investigation, list, *
+
+# Evidence (read-only)
+p, BlockchainAuditor, blockchain.evidence, view, *
+p, BlockchainAuditor, blockchain.evidence, list, *
+p, BlockchainAuditor, blockchain.evidence, history, *
+
+# Custody chain (read-only)
+p, BlockchainAuditor, blockchain.custody, view, *
+p, BlockchainAuditor, blockchain.custody, history, *
+
+# Blockchain transactions (read-only)
+p, BlockchainAuditor, blockchain.transaction, view, *
+p, BlockchainAuditor, blockchain.transaction, list, *
+
+# Case management (read-only)
+p, BlockchainAuditor, blockchain.case, view, *
+p, BlockchainAuditor, blockchain.case, list, *
+
+# Full audit log access
+p, BlockchainAuditor, audits.*, view, *
+
+# Reports access
+p, BlockchainAuditor, reports.*, view, *
+
+# PKI (view own certificate)
+p, BlockchainAuditor, pki.certificate, view, self
+
+# ==============================================================================
+# BLOCKCHAINCOURT ROLE - Legal access + archive/reopen + GUID resolution
+# ==============================================================================
+# Investigation (view + archive + reopen)
+p, BlockchainCourt, blockchain.investigation, view, *
+p, BlockchainCourt, blockchain.investigation, list, *
+p, BlockchainCourt, blockchain.investigation, archive, *
+p, BlockchainCourt, blockchain.investigation, reopen, *
+
+# Evidence (read-only)
+p, BlockchainCourt, blockchain.evidence, view, *
+p, BlockchainCourt, blockchain.evidence, list, *
+p, BlockchainCourt, blockchain.evidence, history, *
+
+# Custody chain (read-only)
+p, BlockchainCourt, blockchain.custody, view, *
+p, BlockchainCourt, blockchain.custody, history, *
+
+# Blockchain transactions (read-only)
+p, BlockchainCourt, blockchain.transaction, view, *
+p, BlockchainCourt, blockchain.transaction, list, *
+
+# Case management (view + update status)
+p, BlockchainCourt, blockchain.case, view, *
+p, BlockchainCourt, blockchain.case, list, *
+p, BlockchainCourt, blockchain.case, update, *
+
+# GUID resolution (UNIQUE to court role)
+p, BlockchainCourt, blockchain.guidmapping, resolve_guid, *
+
+# Full audit log access
+p, BlockchainCourt, audits.*, view, *
+
+# Reports access
+p, BlockchainCourt, reports.*, view, *
+
+# PKI (view own certificate)
+p, BlockchainCourt, pki.certificate, view, self
+
+# ==============================================================================
+# ATTESTATION VERIFIER ROLE - For multi-org attestation services
+# ==============================================================================
+p, AttestationVerifier, attestation.quote, verify, *
+p, AttestationVerifier, attestation.config, view, *
+p, AttestationVerifier, attestation.config, update, *
+
+# ==============================================================================
+# ROLE ASSIGNMENTS (g, user, role)
+# ==============================================================================
+# These will be dynamically assigned based on MSP identities
+# Example: g, CN=user1.lawenforcement.hot.coc.com, BlockchainInvestigator

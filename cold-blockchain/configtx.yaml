@@ -16,26 +16,43 @@ Organizations:
       OrdererEndpoints:
         - orderer.cold.coc.com:7150
 
-  - &Archive
-      Name: ArchiveMSP
-      ID: ArchiveMSP
-      MSPDir: crypto-config/peerOrganizations/archive.cold.coc.com/msp
+  - &Auditor
+      Name: AuditorMSP
+      ID: AuditorMSP
+      MSPDir: crypto-config/peerOrganizations/auditor.cold.coc.com/msp
       Policies:
         Readers:
           Type: Signature
-          Rule: "OR('ArchiveMSP.admin', 'ArchiveMSP.peer', 'ArchiveMSP.client')"
+          Rule: "OR('AuditorMSP.admin', 'AuditorMSP.peer', 'AuditorMSP.client')"
         Writers:
           Type: Signature
-          Rule: "OR('ArchiveMSP.admin', 'ArchiveMSP.client')"
+          Rule: "OR('AuditorMSP.admin', 'AuditorMSP.client')"
         Admins:
           Type: Signature
-          Rule: "OR('ArchiveMSP.admin')"
+          Rule: "OR('AuditorMSP.admin')"
         Endorsement:
           Type: Signature
-          Rule: "OR('ArchiveMSP.peer')"
+          Rule: "OR('AuditorMSP.peer')"
       AnchorPeers:
-        - Host: peer0.archive.cold.coc.com
+        - Host: peer0.auditor.cold.coc.com
           Port: 9051
+
+  - &Court
+      Name: CourtMSP
+      ID: CourtMSP
+      MSPDir: crypto-config/peerOrganizations/court.cold.coc.com/msp
+      Policies:
+        Readers:
+          Type: Signature
+          Rule: "OR('CourtMSP.admin', 'CourtMSP.client')"
+        Writers:
+          Type: Signature
+          Rule: "OR('CourtMSP.admin', 'CourtMSP.client')"
+        Admins:
+          Type: Signature
+          Rule: "OR('CourtMSP.admin')"
+      # No AnchorPeers - client-only organization
+      # No Endorsement policy - Court submits but doesn't endorse
 
 Capabilities:
   Channel: &ChannelCapabilities
@@ -122,11 +139,13 @@ Profiles:
     Application:
       <<: *ApplicationDefaults
       Organizations:
-        - *Archive
+        - *Auditor
+        - *Court
     Consortiums:
       ColdConsortium:
         Organizations:
-          - *Archive
+          - *Auditor
+          - *Court
 
   ColdChainChannel:
     <<: *ChannelDefaults
@@ -139,6 +158,7 @@ Profiles:
     Application:
       <<: *ApplicationDefaults
       Organizations:
-        - *Archive
+        - *Auditor
+        - *Court
       Capabilities:
         <<: *ApplicationCapabilities

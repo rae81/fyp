@@ -1,0 +1,104 @@
+version: '3.8'
+
+networks:
+  hot:
+    external: true
+    name: hot-chain-network
+  cold:
+    external: true
+    name: cold-chain-network
+
+services:
+  # PostgreSQL for Hot Explorer
+  explorerdb-hot:
+    image: hyperledger/explorer-db:1.1.8
+    container_name: explorerdb-hot
+    hostname: explorerdb-hot
+    environment:
+      - DATABASE_DATABASE=fabricexplorer_hot
+      - DATABASE_USERNAME=hppoc
+      - DATABASE_PASSWORD=password
+    healthcheck:
+      test: "pg_isready -h localhost -p 5432 -q -U postgres"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - explorerdb-hot-data:/var/lib/postgresql/data
+    networks:
+      - hot
+
+  # Hot Blockchain Explorer
+  explorer-hot:
+    image: hyperledger/explorer:1.1.8
+    container_name: explorer-hot
+    hostname: explorer-hot
+    environment:
+      - DATABASE_HOST=explorerdb-hot
+      - DATABASE_DATABASE=fabricexplorer_hot
+      - DATABASE_USERNAME=hppoc
+      - DATABASE_PASSWD=password
+      - LOG_LEVEL_APP=info
+      - LOG_LEVEL_DB=info
+      - LOG_LEVEL_CONSOLE=info
+      - LOG_CONSOLE_STDOUT=true
+      - DISCOVERY_AS_LOCALHOST=false
+    volumes:
+      - ./explorer-config/hot/config.json:/opt/explorer/app/platform/fabric/config.json
+      - ./explorer-config/hot/hot-network.json:/opt/explorer/app/platform/fabric/connection-profile/hot-network.json
+      - ./hot-blockchain/crypto-config:/tmp/crypto
+    ports:
+      - 8090:8080
+    depends_on:
+      - explorerdb-hot
+    networks:
+      - hot
+
+  # PostgreSQL for Cold Explorer
+  explorerdb-cold:
+    image: hyperledger/explorer-db:1.1.8
+    container_name: explorerdb-cold
+    hostname: explorerdb-cold
+    environment:
+      - DATABASE_DATABASE=fabricexplorer_cold
+      - DATABASE_USERNAME=hppoc
+      - DATABASE_PASSWORD=password
+    healthcheck:
+      test: "pg_isready -h localhost -p 5432 -q -U postgres"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - explorerdb-cold-data:/var/lib/postgresql/data
+    networks:
+      - cold
+
+  # Cold Blockchain Explorer
+  explorer-cold:
+    image: hyperledger/explorer:1.1.8
+    container_name: explorer-cold
+    hostname: explorer-cold
+    environment:
+      - DATABASE_HOST=explorerdb-cold
+      - DATABASE_DATABASE=fabricexplorer_cold
+      - DATABASE_USERNAME=hppoc
+      - DATABASE_PASSWD=password
+      - LOG_LEVEL_APP=info
+      - LOG_LEVEL_DB=info
+      - LOG_LEVEL_CONSOLE=info
+      - LOG_CONSOLE_STDOUT=true
+      - DISCOVERY_AS_LOCALHOST=false
+    volumes:
+      - ./explorer-config/cold/config.json:/opt/explorer/app/platform/fabric/config.json
+      - ./explorer-config/cold/cold-network.json:/opt/explorer/app/platform/fabric/connection-profile/cold-network.json
+      - ./cold-blockchain/crypto-config:/tmp/crypto
+    ports:
+      - 8091:8080
+    depends_on:
+      - explorerdb-cold
+    networks:
+      - cold
+
+volumes:
+  explorerdb-hot-data:
+  explorerdb-cold-data:

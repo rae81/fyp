@@ -1,0 +1,51 @@
+{
+  "name": "cold-network",
+  "version": "1.0.0",
+  "client": {
+    "tlsEnable": true,
+    "adminCredential": {
+      "id": "exploreradmin",
+      "password": "exploreradminpw"
+    },
+    "enableAuthentication": true,
+    "organization": "ArchiveMSP",
+    "connection": {
+      "timeout": {
+        "peer": {
+          "endorser": "300"
+        },
+        "orderer": "300"
+      }
+    }
+  },
+  "channels": {
+    "coldchannel": {
+      "peers": {
+        "peer0.archive.cold.coc.com": {}
+      }
+    }
+  },
+  "organizations": {
+    "ArchiveMSP": {
+      "mspid": "ArchiveMSP",
+      "adminPrivateKey": {
+        "path": "/tmp/crypto/peerOrganizations/archive.cold.coc.com/users/Admin@archive.cold.coc.com/msp/keystore/priv_sk"
+      },
+      "peers": ["peer0.archive.cold.coc.com"],
+      "signedCert": {
+        "path": "/tmp/crypto/peerOrganizations/archive.cold.coc.com/users/Admin@archive.cold.coc.com/msp/signcerts/Admin@archive.cold.coc.com-cert.pem"
+      }
+    }
+  },
+  "peers": {
+    "peer0.archive.cold.coc.com": {
+      "tlsCACerts": {
+        "path": "/tmp/crypto/peerOrganizations/archive.cold.coc.com/peers/peer0.archive.cold.coc.com/tls/ca.crt"
+      },
+      "url": "grpcs://peer0.archive.cold.coc.com:9051",
+      "grpcOptions": {
+        "ssl-target-name-override": "peer0.archive.cold.coc.com"
+      }
+    }
+  }
+}

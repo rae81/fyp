@@ -1,0 +1,45 @@
+webapp/webapp.log
+
+# Compiled chaincode binaries
+hot-blockchain/chaincode/hot-chaincode
+cold-blockchain/chaincode/cold-chaincode
+
+# Generated certificates and MSP materials (contain private keys)
+organizations/
+hot-blockchain/crypto-config/
+cold-blockchain/crypto-config/
+hot-blockchain/channel-artifacts/
+cold-blockchain/channel-artifacts/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Enclave data
+/tmp/enclave-data/
+enclave-data/
+
+# Docker volumes
+*.tar.gz
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

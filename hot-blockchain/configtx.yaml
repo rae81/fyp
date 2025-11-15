@@ -58,6 +58,40 @@ Organizations:
         - Host: peer0.forensiclab.hot.coc.com
           Port: 8051
 
+  - &Court
+      Name: CourtMSP
+      ID: CourtMSP
+      MSPDir: crypto-config/peerOrganizations/court.hot.coc.com/msp
+      Policies:
+        Readers:
+          Type: Signature
+          Rule: "OR('CourtMSP.admin', 'CourtMSP.client')"
+        Writers:
+          Type: Signature
+          Rule: "OR('CourtMSP.admin', 'CourtMSP.client')"
+        Admins:
+          Type: Signature
+          Rule: "OR('CourtMSP.admin')"
+      # No AnchorPeers - client-only organization
+      # No Endorsement policy - Court submits but doesn't endorse
+
+  - &Auditor
+      Name: AuditorMSP
+      ID: AuditorMSP
+      MSPDir: ../cold-blockchain/crypto-config/peerOrganizations/auditor.cold.coc.com/msp
+      Policies:
+        Readers:
+          Type: Signature
+          Rule: "OR('AuditorMSP.admin', 'AuditorMSP.client')"
+        Writers:
+          Type: Signature
+          Rule: "OR('AuditorMSP.admin', 'AuditorMSP.client')"
+        Admins:
+          Type: Signature
+          Rule: "OR('AuditorMSP.admin')"
+      # No AnchorPeers - client-only, read-only organization on hot chain
+      # No Endorsement policy - Auditor only reads, doesn't endorse
+
 Capabilities:
   Channel: &ChannelCapabilities
     V2_0: true
@@ -145,11 +179,15 @@ Profiles:
       Organizations:
         - *LawEnforcement
         - *ForensicLab
+        - *Court
+        - *Auditor
     Consortiums:
       HotConsortium:
         Organizations:
           - *LawEnforcement
           - *ForensicLab
+          - *Court
+          - *Auditor
 
   HotChainChannel:
     <<: *ChannelDefaults
@@ -164,5 +202,7 @@ Profiles:
       Organizations:
         - *LawEnforcement
         - *ForensicLab
+        - *Court
+        - *Auditor
       Capabilities:
         <<: *ApplicationCapabilities

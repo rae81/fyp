@@ -1,0 +1,10 @@
+{
+  "allowed_mr_enclaves": [
+    "2c90b7b8d929b3a9a8be56419c5e0f631c71a2a96bab7a16152bc6f7b66b397c"
+  ],
+  "allowed_mr_signers": [
+    "50be5ad89d159b3cbb7c89b8f853d35410eab6f7e26e8b91045956029b34a42f"
+  ],
+  "minimum_tcb_level": "1",
+  "max_quote_age_seconds": 300
+}
