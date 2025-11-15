@@ -13,7 +13,7 @@ echo ""
 
 # Step 1: Start enclave
 echo "[Step 1/6] Starting SGX Enclave..."
-docker-compose -f docker-compose-full.yml up -d sgx-enclave
+docker-compose -f docker-compose-full.yml up -d enclave
 
 echo "Waiting for enclave to start..."
 sleep 10
@@ -113,7 +113,7 @@ if [ "$CA_CERT_OK" = false ]; then
 
     # Check which enclave service is actually running
     echo "Checking which enclave service is running..."
-    docker logs sgx-enclave 2>&1 | tail -20
+    docker logs enclave 2>&1 | tail -20
     echo ""
 
     exit 1
