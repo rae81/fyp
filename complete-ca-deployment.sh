@@ -144,9 +144,9 @@ fi
 
 if [ "$ORDERERS_OK" = false ]; then
     echo ""
-    echo -e "${YELLOW}[Step 9.5/10] Fixing orderer MSP configuration...${NC}"
-    chmod +x fix-orderer-msp.sh
-    ./fix-orderer-msp.sh
+    echo -e "${YELLOW}[Step 9.5/10] Fixing ALL MSP configurations...${NC}"
+    chmod +x fix-all-msp.sh
+    ./fix-all-msp.sh
 
     # Verify again after fix
     if ! docker ps | grep -q "orderer.hot.coc.com" || ! docker ps | grep -q "orderer.cold.coc.com"; then
@@ -154,7 +154,7 @@ if [ "$ORDERERS_OK" = false ]; then
         echo "Check logs with: docker logs orderer.hot.coc.com"
         exit 1
     fi
-    echo -e "${GREEN}✓ Orderers fixed and running${NC}"
+    echo -e "${GREEN}✓ All MSP configurations fixed and containers running${NC}"
 fi
 echo ""
 

@@ -18,21 +18,26 @@ Failed to setup local msp with config: administrators must be declared when no a
 
 ## The Fix (30 seconds)
 
-Pull the latest changes and run the fix script:
+Pull the latest changes and run the comprehensive fix script:
 
 ```bash
 cd ~/blockchain-projects/Dual-hyperledger-Blockchain
 git pull origin claude/dual-blockchain-01LQXXJ5gH5AVRmuZ2ppzG5M
 
-# Run the fix
-./fix-orderer-msp.sh
+# Run the comprehensive fix (orderers + peers)
+./fix-all-msp.sh
 ```
 
 **What the fix does:**
-1. Creates `config.yaml` files in orderer MSP directories with NodeOU enabled
-2. Copies admin certificates to `admincerts/` folders in orderer MSPs
-3. Restarts both orderers (hot and cold)
-4. Verifies they're running
+1. Creates `config.yaml` files in ALL MSP directories with NodeOU enabled
+2. Copies admin certificates to `admincerts/` folders for:
+   - Hot & Cold orderers
+   - Law Enforcement peer
+   - Forensic Lab peer
+   - Auditor peer
+   - Court organization
+3. Restarts all containers (orderers, peers, CLI)
+4. Verifies everything is running
 
 ## Then Create Channels
 
@@ -92,14 +97,23 @@ We're using CA-based enrollment (not cryptogen), which doesn't auto-create these
 
 ### What Gets Modified
 
-**Hot orderer:**
-- `organizations/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/msp/config.yaml`
-- `organizations/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/msp/admincerts/cert.pem`
-- `organizations/ordererOrganizations/hot.coc.com/msp/config.yaml`
-- `organizations/ordererOrganizations/hot.coc.com/msp/admincerts/cert.pem`
+**Orderer Organizations:**
+- Hot orderer: `organizations/ordererOrganizations/hot.coc.com/orderers/*/msp/`
+- Cold orderer: `organizations/ordererOrganizations/cold.coc.com/orderers/*/msp/`
+- Org-level MSPs for both hot and cold
 
-**Cold orderer:**
-- Same structure for `organizations/ordererOrganizations/cold.coc.com/`
+**Peer Organizations:**
+- Law Enforcement: `organizations/peerOrganizations/lawenforcement.hot.coc.com/`
+  - Peer MSP: `peers/peer0.lawenforcement.hot.coc.com/msp/`
+  - Admin MSP: `users/Admin@lawenforcement.hot.coc.com/msp/`
+  - Org MSP: `msp/`
+- Forensic Lab: `organizations/peerOrganizations/forensiclab.hot.coc.com/`
+- Auditor: `organizations/peerOrganizations/auditor.cold.coc.com/`
+- Court: `organizations/peerOrganizations/court.coc.com/`
+
+**Each MSP gets:**
+- `config.yaml` - NodeOU configuration
+- `admincerts/cert.pem` - Admin certificate
 
 ### Certificate Chain Verification
 
@@ -119,9 +133,11 @@ openssl x509 -in fabric-ca/ca-orderer-hot/ca-cert.pem -text -noout | grep -A3 "I
 
 ## Files Changed in This Update
 
-- `fix-orderer-msp.sh` - NEW: MSP configuration fix script
+- `fix-all-msp.sh` - NEW: Comprehensive MSP configuration fix (orderers + peers)
+- `fix-orderer-msp.sh` - Legacy: Orderer-only fix (use fix-all-msp.sh instead)
 - `complete-ca-deployment.sh` - UPDATED: Auto-detects and fixes MSP issues
 - `DEPLOYMENT_STATUS.md` - UPDATED: Added MSP fix instructions
+- `QUICK_FIX.md` - UPDATED: Complete troubleshooting guide
 
 ---
 

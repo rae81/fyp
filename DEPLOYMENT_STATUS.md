@@ -204,26 +204,28 @@ chmod +x scripts/quick-setup-cryptogen.sh
 
 ## Update: MSP Configuration Issue
 
-After running `complete-ca-deployment.sh`, orderers may fail with:
+After running `complete-ca-deployment.sh`, containers may fail with:
 ```
 Failed to setup local msp with config: administrators must be declared when no admin ou classification is set
 ```
 
 **Quick Fix:**
 ```bash
-./fix-orderer-msp.sh
+./fix-all-msp.sh
 ```
 
-This script:
-1. Creates `config.yaml` files in orderer MSP directories with NodeOU enabled
-2. Copies admin certificates to `admincerts/` folders
-3. Restarts orderers
-4. Verifies they're running
+This comprehensive script:
+1. Creates `config.yaml` files in ALL MSP directories with NodeOU enabled
+2. Copies admin certificates to `admincerts/` folders for all orgs
+3. Restarts all containers (orderers, peers, CLI)
+4. Verifies everything is running
 
 Then proceed with:
 ```bash
 ./scripts/create-channels-with-dynamic-mtls.sh
 ```
+
+**Note:** The `complete-ca-deployment.sh` script now automatically runs this fix when needed.
 
 ---
 
