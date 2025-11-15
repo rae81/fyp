@@ -256,7 +256,7 @@ class SGXEnclave:
             raise ValueError("Invalid CSR signature")
 
         # Determine certificate extensions based on type
-        if cert_type == "intermediate":
+        if cert_type in ["intermediate", "intermediate-ca"]:
             path_length = 1
             key_usage = x509.KeyUsage(
                 digital_signature=True,
@@ -320,6 +320,20 @@ class SGXEnclave:
             )
 
         cert_builder = cert_builder.add_extension(key_usage, critical=True)
+
+        # Add Subject Key Identifier (required by Hyperledger Fabric)
+        cert_builder = cert_builder.add_extension(
+            x509.SubjectKeyIdentifier.from_public_key(csr.public_key()),
+            critical=False,
+        )
+
+        # Add Authority Key Identifier (required by Hyperledger Fabric)
+        cert_builder = cert_builder.add_extension(
+            x509.AuthorityKeyIdentifier.from_issuer_public_key(
+                self._secure_memory["root_ca_cert"].public_key()
+            ),
+            critical=False,
+        )
 
         # Add Subject Alternative Names from CSR if present
         try:

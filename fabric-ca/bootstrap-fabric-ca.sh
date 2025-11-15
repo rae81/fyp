@@ -73,7 +73,7 @@ for ORG_SPEC in "${ORGS[@]}"; do
     echo "  Requesting certificate from enclave..."
     CERT_RESPONSE=$(curl -s -X POST "$ENCLAVE_URL/ca/sign" \
         -H "Content-Type: application/json" \
-        -d "{\"csr\": $(echo "$CSR_CONTENT" | jq -Rs .), \"type\": \"intermediate\", \"validity_days\": 1825}")
+        -d "{\"csr\": $(echo "$CSR_CONTENT" | jq -Rs .), \"type\": \"intermediate-ca\", \"validity_days\": 1825}")
 
     # Extract certificate
     echo "$CERT_RESPONSE" | python3 -c "import sys, json; print(json.load(sys.stdin)['certificate'])" > "$CA_DIR/ca-cert.pem"

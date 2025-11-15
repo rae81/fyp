@@ -2,7 +2,7 @@ Organizations:
   - &OrdererOrg
       Name: OrdererMSP
       ID: OrdererMSP
-      MSPDir: crypto-config/ordererOrganizations/hot.coc.com/msp
+      MSPDir: ../organizations/ordererOrganizations/hot.coc.com/msp
       Policies:
         Readers:
           Type: Signature
@@ -19,7 +19,7 @@ Organizations:
   - &LawEnforcement
       Name: LawEnforcementMSP
       ID: LawEnforcementMSP
-      MSPDir: crypto-config/peerOrganizations/lawenforcement.hot.coc.com/msp
+      MSPDir: ../organizations/peerOrganizations/lawenforcement.hot.coc.com/msp
       Policies:
         Readers:
           Type: Signature
@@ -40,7 +40,7 @@ Organizations:
   - &ForensicLab
       Name: ForensicLabMSP
       ID: ForensicLabMSP
-      MSPDir: crypto-config/peerOrganizations/forensiclab.hot.coc.com/msp
+      MSPDir: ../organizations/peerOrganizations/forensiclab.hot.coc.com/msp
       Policies:
         Readers:
           Type: Signature
@@ -61,7 +61,7 @@ Organizations:
   - &Court
       Name: CourtMSP
       ID: CourtMSP
-      MSPDir: crypto-config/peerOrganizations/court.hot.coc.com/msp
+      MSPDir: ../organizations/peerOrganizations/court.coc.com/msp
       Policies:
         Readers:
           Type: Signature
@@ -78,7 +78,7 @@ Organizations:
   - &Auditor
       Name: AuditorMSP
       ID: AuditorMSP
-      MSPDir: ../cold-blockchain/crypto-config/peerOrganizations/auditor.cold.coc.com/msp
+      MSPDir: ../organizations/peerOrganizations/auditor.cold.coc.com/msp
       Policies:
         Readers:
           Type: Signature
@@ -134,8 +134,8 @@ Orderer: &OrdererDefaults
     Consenters:
       - Host: orderer.hot.coc.com
         Port: 7050
-        ClientTLSCert: crypto-config/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/tls/server.crt
-        ServerTLSCert: crypto-config/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/tls/server.crt
+        ClientTLSCert: ../organizations/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/tls/server.crt
+        ServerTLSCert: ../organizations/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/tls/server.crt
   Organizations:
   Policies:
     Readers:

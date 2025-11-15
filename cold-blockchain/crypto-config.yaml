@@ -4,22 +4,22 @@
 OrdererOrgs:
   - Name: Orderer
     Domain: cold.coc.com
-    EnableNodeOUs: true
+    EnableNodeOUs: false
     Specs:
       - Hostname: orderer
 
 PeerOrgs:
   - Name: Auditor
     Domain: auditor.cold.coc.com
-    EnableNodeOUs: true
+    EnableNodeOUs: false
     Template:
       Count: 1
     Users:
       Count: 2
 
   - Name: Court
-    Domain: court.cold.coc.com
-    EnableNodeOUs: true
+    Domain: court.coc.com
+    EnableNodeOUs: false
     Template:
       Count: 1  # Generate peer certs (we'll use admin/user certs only)
     Users:

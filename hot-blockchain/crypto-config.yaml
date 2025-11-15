@@ -4,14 +4,14 @@
 OrdererOrgs:
   - Name: Orderer
     Domain: hot.coc.com
-    EnableNodeOUs: true
+    EnableNodeOUs: false
     Specs:
       - Hostname: orderer
 
 PeerOrgs:
   - Name: LawEnforcement
     Domain: lawenforcement.hot.coc.com
-    EnableNodeOUs: true
+    EnableNodeOUs: false
     Template:
       Count: 1
     Users:
@@ -19,15 +19,15 @@ PeerOrgs:
 
   - Name: ForensicLab
     Domain: forensiclab.hot.coc.com
-    EnableNodeOUs: true
+    EnableNodeOUs: false
     Template:
       Count: 1
     Users:
       Count: 2
 
   - Name: Court
-    Domain: court.hot.coc.com
-    EnableNodeOUs: true
+    Domain: court.coc.com
+    EnableNodeOUs: false
     Template:
       Count: 1  # Generate peer certs (we'll use admin/user certs only)
     Users:

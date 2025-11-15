@@ -2,7 +2,7 @@ Organizations:
   - &OrdererOrg
       Name: OrdererMSP
       ID: OrdererMSP
-      MSPDir: crypto-config/ordererOrganizations/cold.coc.com/msp
+      MSPDir: ../organizations/ordererOrganizations/cold.coc.com/msp
       Policies:
         Readers:
           Type: Signature
@@ -19,7 +19,7 @@ Organizations:
   - &Auditor
       Name: AuditorMSP
       ID: AuditorMSP
-      MSPDir: crypto-config/peerOrganizations/auditor.cold.coc.com/msp
+      MSPDir: ../organizations/peerOrganizations/auditor.cold.coc.com/msp
       Policies:
         Readers:
           Type: Signature
@@ -40,7 +40,7 @@ Organizations:
   - &Court
       Name: CourtMSP
       ID: CourtMSP
-      MSPDir: crypto-config/peerOrganizations/court.cold.coc.com/msp
+      MSPDir: ../organizations/peerOrganizations/court.coc.com/msp
       Policies:
         Readers:
           Type: Signature
@@ -96,8 +96,8 @@ Orderer: &OrdererDefaults
     Consenters:
       - Host: orderer.cold.coc.com
         Port: 7150
-        ClientTLSCert: crypto-config/ordererOrganizations/cold.coc.com/orderers/orderer.cold.coc.com/tls/server.crt
-        ServerTLSCert: crypto-config/ordererOrganizations/cold.coc.com/orderers/orderer.cold.coc.com/tls/server.crt
+        ClientTLSCert: ../organizations/ordererOrganizations/cold.coc.com/orderers/orderer.cold.coc.com/tls/server.crt
+        ServerTLSCert: ../organizations/ordererOrganizations/cold.coc.com/orderers/orderer.cold.coc.com/tls/server.crt
   Organizations:
   Policies:
     Readers:
