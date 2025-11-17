@@ -59,24 +59,24 @@ docker-compose -f docker-compose-full.yml stop orderer.hot.coc.com peer0.lawenfo
 echo -e "  ${GREEN}✓${NC} Containers stopped"
 
 # ============================================================================
-# PHASE 3: CLEAN OLD CHANNEL DATA
+# PHASE 3: CLEAN OLD CHANNEL DATA (COMPLETE CLEANUP)
 # ============================================================================
 
 echo ""
 echo -e "${CYAN}[3/6] Cleaning old channel data...${NC}"
 
-# Clean orderer channel data
-echo -e "  ${YELLOW}Cleaning orderer channel data...${NC}"
-docker run --rm -v fyp_orderer.hot.coc.com:/var/hyperledger/production busybox sh -c "rm -rf /var/hyperledger/production/orderer/chains/hotchannel"
+# Clean orderer channel data AND etcdraft WAL (this is critical!)
+echo -e "  ${YELLOW}Cleaning orderer channel data and WAL...${NC}"
+docker run --rm -v fyp_orderer.hot.coc.com:/var/hyperledger/production busybox sh -c "rm -rf /var/hyperledger/production/orderer/chains/hotchannel /var/hyperledger/production/orderer/etcdraft/wal/hotchannel /var/hyperledger/production/orderer/etcdraft/snapshot/hotchannel"
 
-# Clean peer channel data
-echo -e "  ${YELLOW}Cleaning peer0.lawenforcement channel data...${NC}"
-docker run --rm -v fyp_peer0.lawenforcement.hot.coc.com:/var/hyperledger/production busybox sh -c "rm -rf /var/hyperledger/production/ledgersData/chains/chains/hotchannel"
+# Clean COMPLETE peer ledger data (not just chain data)
+echo -e "  ${YELLOW}Cleaning peer0.lawenforcement complete ledger...${NC}"
+docker run --rm -v fyp_peer0.lawenforcement.hot.coc.com:/var/hyperledger/production busybox sh -c "rm -rf /var/hyperledger/production/ledgersData/chains/chains/hotchannel /var/hyperledger/production/ledgersData/stateLeveldb/hotchannel /var/hyperledger/production/ledgersData/historyLeveldb/hotchannel /var/hyperledger/production/ledgersData/bookkeeper/hotchannel /var/hyperledger/production/ledgersData/pvtdataStore/hotchannel /var/hyperledger/production/ledgersData/configHistory/hotchannel"
 
-echo -e "  ${YELLOW}Cleaning peer0.forensiclab channel data...${NC}"
-docker run --rm -v fyp_peer0.forensiclab.hot.coc.com:/var/hyperledger/production busybox sh -c "rm -rf /var/hyperledger/production/ledgersData/chains/chains/hotchannel"
+echo -e "  ${YELLOW}Cleaning peer0.forensiclab complete ledger...${NC}"
+docker run --rm -v fyp_peer0.forensiclab.hot.coc.com:/var/hyperledger/production busybox sh -c "rm -rf /var/hyperledger/production/ledgersData/chains/chains/hotchannel /var/hyperledger/production/ledgersData/stateLeveldb/hotchannel /var/hyperledger/production/ledgersData/historyLeveldb/hotchannel /var/hyperledger/production/ledgersData/bookkeeper/hotchannel /var/hyperledger/production/ledgersData/pvtdataStore/hotchannel /var/hyperledger/production/ledgersData/configHistory/hotchannel"
 
-echo -e "  ${GREEN}✓${NC} Old channel data cleaned"
+echo -e "  ${GREEN}✓${NC} Complete channel data cleaned"
 
 # ============================================================================
 # PHASE 4: REPLACE GENESIS BLOCK AND RESTART CONTAINERS
