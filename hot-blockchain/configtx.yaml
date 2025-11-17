@@ -168,24 +168,8 @@ Channel: &ChannelDefaults
     <<: *ChannelCapabilities
 
 Profiles:
+  # Fabric 2.5 Application Channel (no system channel, no consortiums)
   HotChainGenesis:
-    <<: *ChannelDefaults
-    Orderer:
-      <<: *OrdererDefaults
-      Organizations:
-        - *OrdererOrg
-    Application:
-      <<: *ApplicationDefaults
-      Organizations:
-        - *LawEnforcement
-        - *ForensicLab
-    Consortiums:
-      HotConsortium:
-        Organizations:
-          - *LawEnforcement
-          - *ForensicLab
-
-  HotChainChannel:
     <<: *ChannelDefaults
     Orderer:
       <<: *OrdererDefaults
