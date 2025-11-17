@@ -48,13 +48,13 @@ docker run --rm \
     sh -c "configtxlator proto_decode --input hot-blockchain/channel-artifacts/hotchannel-fixed.block --type common.Block | jq -r '.data.data[0].payload.data.config.channel_group.groups.Application.groups | keys[]'" | sort
 
 # ============================================================================
-# PHASE 2: STOP ORDERER AND PEERS
+# PHASE 2: STOP ORDERER, PEERS, AND CLI
 # ============================================================================
 
 echo ""
-echo -e "${CYAN}[2/6] Stopping orderer and peers...${NC}"
+echo -e "${CYAN}[2/6] Stopping orderer, peers, and CLI...${NC}"
 
-docker-compose -f docker-compose-full.yml stop orderer.hot.coc.com peer0.lawenforcement.hot.coc.com peer0.forensiclab.hot.coc.com
+docker-compose -f docker-compose-full.yml stop orderer.hot.coc.com peer0.lawenforcement.hot.coc.com peer0.forensiclab.hot.coc.com cli
 
 echo -e "  ${GREEN}✓${NC} Containers stopped"
 
@@ -105,6 +105,25 @@ echo -e "  ${GREEN}✓${NC} Containers restarted"
 # Wait for containers to initialize
 echo -e "  ${YELLOW}Waiting for containers to initialize (30s)...${NC}"
 sleep 30
+
+# Verify DNS resolution works
+echo -e "  ${YELLOW}Verifying CLI can resolve orderer hostname...${NC}"
+for i in {1..5}; do
+    if docker exec cli getent hosts orderer.hot.coc.com > /dev/null 2>&1; then
+        echo -e "  ${GREEN}✓${NC} DNS resolution working"
+        break
+    else
+        if [ $i -eq 5 ]; then
+            echo -e "  ${RED}✗${NC} DNS resolution failed after 5 attempts"
+            echo -e "  ${YELLOW}Restarting CLI container to clear DNS cache...${NC}"
+            docker-compose -f docker-compose-full.yml restart cli
+            sleep 5
+        else
+            echo -e "  ${YELLOW}Attempt $i/5 failed, retrying in 2s...${NC}"
+            sleep 2
+        fi
+    fi
+done
 
 # ============================================================================
 # PHASE 5: JOIN ORDERER TO CHANNEL
