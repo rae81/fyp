@@ -18,7 +18,7 @@ NC='\033[0m'
 CC_NAME="dfir"
 CC_VERSION="1.0"
 CC_SEQUENCE=1
-CC_SRC_PATH="github.com/chaincode"
+CC_SRC_PATH="/opt/gopath/src/github.com/hyperledger/fabric/peer/chaincode"
 
 # Set environment
 export PATH="${PWD}/fabric-samples/bin:$PATH"
@@ -58,7 +58,7 @@ done
 # Step 2: Package Hot Blockchain Chaincode
 print_step "Packaging Hot blockchain chaincode..."
 docker exec cli peer lifecycle chaincode package dfir.tar.gz \
-    --path /opt/gopath/src/${CC_SRC_PATH} \
+    --path ${CC_SRC_PATH} \
     --lang golang \
     --label dfir_${CC_VERSION}
 check_result "Hot chaincode packaged"
@@ -71,10 +71,10 @@ check_result "Installed on Law Enforcement peer"
 # Step 4: Install on Hot Blockchain - Forensic Lab Peer
 print_step "Installing chaincode on Forensic Lab peer..."
 docker exec \
-    -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/forensiclab.hot.coc.com/users/Admin@forensiclab.hot.coc.com/msp \
+    -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/forensiclab.hot.coc.com/users/Admin@forensiclab.hot.coc.com/msp \
     -e CORE_PEER_ADDRESS=peer0.forensiclab.hot.coc.com:8051 \
     -e CORE_PEER_LOCALMSPID=ForensicLabMSP \
-    -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/forensiclab.hot.coc.com/peers/peer0.forensiclab.hot.coc.com/tls/ca.crt \
+    -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/forensiclab.hot.coc.com/peers/peer0.forensiclab.hot.coc.com/tls/ca.crt \
     cli peer lifecycle chaincode install dfir.tar.gz
 check_result "Installed on Forensic Lab peer"
 
@@ -93,7 +93,7 @@ print_step "Approving chaincode for Law Enforcement organization..."
 docker exec cli peer lifecycle chaincode approveformyorg \
     -o orderer.hot.coc.com:7050 \
     --ordererTLSHostnameOverride orderer.hot.coc.com \
-    --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/msp/tlscacerts/tlsca.hot.coc.com-cert.pem \
+    --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/msp/tlscacerts/tlsca.hot.coc.com-cert.pem \
     --channelID hotchannel \
     --name ${CC_NAME} \
     --version ${CC_VERSION} \
@@ -104,14 +104,14 @@ check_result "Approved for Law Enforcement"
 # Step 7: Approve chaincode for Forensic Lab
 print_step "Approving chaincode for Forensic Lab organization..."
 docker exec \
-    -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/forensiclab.hot.coc.com/users/Admin@forensiclab.hot.coc.com/msp \
+    -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/forensiclab.hot.coc.com/users/Admin@forensiclab.hot.coc.com/msp \
     -e CORE_PEER_ADDRESS=peer0.forensiclab.hot.coc.com:8051 \
     -e CORE_PEER_LOCALMSPID=ForensicLabMSP \
-    -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/forensiclab.hot.coc.com/peers/peer0.forensiclab.hot.coc.com/tls/ca.crt \
+    -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/forensiclab.hot.coc.com/peers/peer0.forensiclab.hot.coc.com/tls/ca.crt \
     cli peer lifecycle chaincode approveformyorg \
     -o orderer.hot.coc.com:7050 \
     --ordererTLSHostnameOverride orderer.hot.coc.com \
-    --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/msp/tlscacerts/tlsca.hot.coc.com-cert.pem \
+    --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/msp/tlscacerts/tlsca.hot.coc.com-cert.pem \
     --channelID hotchannel \
     --name ${CC_NAME} \
     --version ${CC_VERSION} \
@@ -124,15 +124,15 @@ print_step "Committing chaincode to Hot blockchain..."
 docker exec cli peer lifecycle chaincode commit \
     -o orderer.hot.coc.com:7050 \
     --ordererTLSHostnameOverride orderer.hot.coc.com \
-    --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/msp/tlscacerts/tlsca.hot.coc.com-cert.pem \
+    --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/msp/tlscacerts/tlsca.hot.coc.com-cert.pem \
     --channelID hotchannel \
     --name ${CC_NAME} \
     --version ${CC_VERSION} \
     --sequence ${CC_SEQUENCE} \
     --peerAddresses peer0.lawenforcement.hot.coc.com:7051 \
-    --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/lawenforcement.hot.coc.com/peers/peer0.lawenforcement.hot.coc.com/tls/ca.crt \
+    --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/lawenforcement.hot.coc.com/peers/peer0.lawenforcement.hot.coc.com/tls/ca.crt \
     --peerAddresses peer0.forensiclab.hot.coc.com:8051 \
-    --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/forensiclab.hot.coc.com/peers/peer0.forensiclab.hot.coc.com/tls/ca.crt
+    --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/forensiclab.hot.coc.com/peers/peer0.forensiclab.hot.coc.com/tls/ca.crt
 check_result "Committed to Hot blockchain"
 
 # Step 9: Deploy to Cold Blockchain
@@ -160,7 +160,7 @@ echo "Cold Package ID: $PACKAGE_ID_COLD"
 docker exec cli-cold peer lifecycle chaincode approveformyorg \
     -o orderer.cold.coc.com:7150 \
     --ordererTLSHostnameOverride orderer.cold.coc.com \
-    --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/cold.coc.com/orderers/orderer.cold.coc.com/msp/tlscacerts/tlsca.cold.coc.com-cert.pem \
+    --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/ordererOrganizations/cold.coc.com/orderers/orderer.cold.coc.com/msp/tlscacerts/tlsca.cold.coc.com-cert.pem \
     --channelID coldchannel \
     --name ${CC_NAME} \
     --version ${CC_VERSION} \
@@ -172,13 +172,13 @@ check_result "Approved for Archive organization"
 docker exec cli-cold peer lifecycle chaincode commit \
     -o orderer.cold.coc.com:7150 \
     --ordererTLSHostnameOverride orderer.cold.coc.com \
-    --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/cold.coc.com/orderers/orderer.cold.coc.com/msp/tlscacerts/tlsca.cold.coc.com-cert.pem \
+    --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/ordererOrganizations/cold.coc.com/orderers/orderer.cold.coc.com/msp/tlscacerts/tlsca.cold.coc.com-cert.pem \
     --channelID coldchannel \
     --name ${CC_NAME} \
     --version ${CC_VERSION} \
     --sequence ${CC_SEQUENCE} \
     --peerAddresses peer0.auditor.cold.coc.com:9051 \
-    --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/auditor.cold.coc.com/peers/peer0.auditor.cold.coc.com/tls/ca.crt
+    --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/auditor.cold.coc.com/peers/peer0.auditor.cold.coc.com/tls/ca.crt
 check_result "Committed to Cold blockchain"
 
 # Step 10: Initialize chaincode with PRV configuration from Enclave
@@ -208,11 +208,11 @@ echo "Initializing Hot blockchain chaincode..."
 docker exec cli peer chaincode invoke \
     -o orderer.hot.coc.com:7050 \
     --ordererTLSHostnameOverride orderer.hot.coc.com \
-    --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/msp/tlscacerts/tlsca.hot.coc.com-cert.pem \
+    --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/msp/tlscacerts/tlsca.hot.coc.com-cert.pem \
     -C hotchannel \
     -n ${CC_NAME} \
     --peerAddresses peer0.lawenforcement.hot.coc.com:7051 \
-    --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/lawenforcement.hot.coc.com/peers/peer0.lawenforcement.hot.coc.com/tls/ca.crt \
+    --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/lawenforcement.hot.coc.com/peers/peer0.lawenforcement.hot.coc.com/tls/ca.crt \
     -c "{\"function\":\"InitLedger\",\"Args\":[\"$PUBLIC_KEY\",\"$MRENCLAVE\",\"$MRSIGNER\"]}" \
     2>&1
 check_result "Hot blockchain initialized with enclave attestation"
@@ -222,11 +222,11 @@ echo "Initializing Cold blockchain chaincode..."
 docker exec cli-cold peer chaincode invoke \
     -o orderer.cold.coc.com:7150 \
     --ordererTLSHostnameOverride orderer.cold.coc.com \
-    --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/cold.coc.com/orderers/orderer.cold.coc.com/msp/tlscacerts/tlsca.cold.coc.com-cert.pem \
+    --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/ordererOrganizations/cold.coc.com/orderers/orderer.cold.coc.com/msp/tlscacerts/tlsca.cold.coc.com-cert.pem \
     -C coldchannel \
     -n ${CC_NAME} \
     --peerAddresses peer0.auditor.cold.coc.com:9051 \
-    --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/auditor.cold.coc.com/peers/peer0.auditor.cold.coc.com/tls/ca.crt \
+    --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/auditor.cold.coc.com/peers/peer0.auditor.cold.coc.com/tls/ca.crt \
     -c "{\"function\":\"InitLedger\",\"Args\":[\"$PUBLIC_KEY\",\"$MRENCLAVE\",\"$MRSIGNER\"]}" \
     2>&1
 check_result "Cold blockchain initialized with enclave attestation"
