@@ -97,14 +97,14 @@ cp hot-blockchain/channel-artifacts/hotchannel-fixed.block hot-blockchain/channe
 
 echo -e "  ${GREEN}✓${NC} Genesis block replaced"
 
-# Restart containers
-docker-compose -f docker-compose-full.yml up -d orderer.hot.coc.com peer0.lawenforcement.hot.coc.com peer0.forensiclab.hot.coc.com
+# Restart containers (including CLI to refresh DNS cache)
+docker-compose -f docker-compose-full.yml up -d orderer.hot.coc.com peer0.lawenforcement.hot.coc.com peer0.forensiclab.hot.coc.com cli
 
 echo -e "  ${GREEN}✓${NC} Containers restarted"
 
 # Wait for containers to initialize
-echo -e "  ${YELLOW}Waiting for containers to initialize (20s)...${NC}"
-sleep 20
+echo -e "  ${YELLOW}Waiting for containers to initialize (30s)...${NC}"
+sleep 30
 
 # ============================================================================
 # PHASE 5: JOIN ORDERER TO CHANNEL
