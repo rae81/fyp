@@ -130,24 +130,9 @@ Channel: &ChannelDefaults
     <<: *ChannelCapabilities
 
 Profiles:
+  # Fabric 2.5 Application Channel (no system channel, no consortiums)
+  # Court excluded - has no peer, uses API access only
   ColdChainGenesis:
-    <<: *ChannelDefaults
-    Orderer:
-      <<: *OrdererDefaults
-      Organizations:
-        - *OrdererOrg
-    Application:
-      <<: *ApplicationDefaults
-      Organizations:
-        - *Auditor
-        - *Court
-    Consortiums:
-      ColdConsortium:
-        Organizations:
-          - *Auditor
-          - *Court
-
-  ColdChainChannel:
     <<: *ChannelDefaults
     Orderer:
       <<: *OrdererDefaults
@@ -159,6 +144,5 @@ Profiles:
       <<: *ApplicationDefaults
       Organizations:
         - *Auditor
-        - *Court
       Capabilities:
         <<: *ApplicationCapabilities
