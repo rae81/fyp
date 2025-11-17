@@ -94,22 +94,17 @@ print_success "Docker is running"
 
 print_header "PHASE 2: REPOSITORY SETUP"
 
-REPO_DIR="/home/user/fyp"
+# Use current directory instead of hardcoded path
+REPO_DIR="$(pwd)"
 
 if [ -d "$REPO_DIR/.git" ]; then
-    print_step "Repository exists, pulling latest changes..."
-    cd "$REPO_DIR"
-    git fetch origin
-    git checkout claude/dual-blockchain-copy-01JqBne3N3BgWq2Jh7ymGVe1
-    git pull origin claude/dual-blockchain-copy-01JqBne3N3BgWq2Jh7ymGVe1 || print_warning "Already up to date"
-    print_success "Repository updated"
+    print_step "Using repository at $REPO_DIR"
+    print_success "Repository found"
 else
-    print_error "Repository not found at $REPO_DIR"
-    print_error "Please run from the cloned repository directory"
+    print_error "Not in a git repository"
+    print_error "Please run this script from inside the cloned repository directory"
     exit 1
 fi
-
-cd "$REPO_DIR"
 
 # ============================================================================
 # PHASE 3: CLEAN ENVIRONMENT
