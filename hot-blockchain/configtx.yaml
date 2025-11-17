@@ -179,15 +179,11 @@ Profiles:
       Organizations:
         - *LawEnforcement
         - *ForensicLab
-        - *Court
-        - *Auditor
     Consortiums:
       HotConsortium:
         Organizations:
           - *LawEnforcement
           - *ForensicLab
-          - *Court
-          - *Auditor
 
   HotChainChannel:
     <<: *ChannelDefaults
@@ -202,7 +198,5 @@ Profiles:
       Organizations:
         - *LawEnforcement
         - *ForensicLab
-        - *Court
-        - *Auditor
       Capabilities:
         <<: *ApplicationCapabilities
