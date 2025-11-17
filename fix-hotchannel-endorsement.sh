@@ -113,11 +113,6 @@ sleep 20
 echo ""
 echo -e "${CYAN}[5/6] Joining orderer to channel...${NC}"
 
-# Reconnect peers to network (in case they lost connection)
-docker network connect fyp_dfir-network peer0.lawenforcement.hot.coc.com 2>/dev/null || echo "  Already connected"
-docker network connect fyp_dfir-network peer0.forensiclab.hot.coc.com 2>/dev/null || echo "  Already connected"
-docker network connect fyp_dfir-network cli 2>/dev/null || echo "  Already connected"
-
 # Join orderer to channel using osnadmin
 docker exec cli osnadmin channel join \
     --channelID hotchannel \

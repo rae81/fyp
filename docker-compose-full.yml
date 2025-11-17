@@ -505,3 +505,74 @@ services:
     depends_on:
       - couchdb2
       - ca-auditor
+
+  # ============================================================================
+  # CLI Tools for Blockchain Interaction
+  # ============================================================================
+
+  cli:
+    container_name: cli
+    image: hyperledger/fabric-tools:2.5
+    hostname: cli
+    tty: true
+    stdin_open: true
+    networks:
+      dfir-network:
+        ipv4_address: 172.20.0.100
+    environment:
+      - GOPATH=/opt/gopath
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_PEER_ID=cli
+      - CORE_PEER_ADDRESS=peer0.lawenforcement.hot.coc.com:7051
+      - CORE_PEER_LOCALMSPID=LawEnforcementMSP
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/lawenforcement.hot.coc.com/peers/peer0.lawenforcement.hot.coc.com/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/lawenforcement.hot.coc.com/peers/peer0.lawenforcement.hot.coc.com/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/lawenforcement.hot.coc.com/peers/peer0.lawenforcement.hot.coc.com/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/lawenforcement.hot.coc.com/users/Admin@lawenforcement.hot.coc.com/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+      - /var/run/docker.sock:/host/var/run/docker.sock
+      - ./hot-blockchain/chaincode:/opt/gopath/src/github.com/hyperledger/fabric/peer/chaincode
+      - ./organizations:/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations
+      - ./hot-blockchain/scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+      - ./hot-blockchain/channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+    depends_on:
+      - orderer.hot.coc.com
+      - peer0.lawenforcement.hot.coc.com
+      - peer0.forensiclab.hot.coc.com
+
+  cli-cold:
+    container_name: cli-cold
+    image: hyperledger/fabric-tools:2.5
+    hostname: cli-cold
+    tty: true
+    stdin_open: true
+    networks:
+      dfir-network:
+        ipv4_address: 172.20.0.101
+    environment:
+      - GOPATH=/opt/gopath
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_PEER_ID=cli-cold
+      - CORE_PEER_ADDRESS=peer0.auditor.cold.coc.com:9051
+      - CORE_PEER_LOCALMSPID=AuditorMSP
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/auditor.cold.coc.com/peers/peer0.auditor.cold.coc.com/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/auditor.cold.coc.com/peers/peer0.auditor.cold.coc.com/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/auditor.cold.coc.com/peers/peer0.auditor.cold.coc.com/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/auditor.cold.coc.com/users/Admin@auditor.cold.coc.com/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+      - /var/run/docker.sock:/host/var/run/docker.sock
+      - ./cold-blockchain/chaincode:/opt/gopath/src/github.com/chaincode
+      - ./organizations:/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations
+      - ./cold-blockchain/scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+      - ./cold-blockchain/channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+    depends_on:
+      - orderer.cold.coc.com
+      - peer0.auditor.cold.coc.com
