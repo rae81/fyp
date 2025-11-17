@@ -45,7 +45,7 @@ check_result() {
 
 # Step 1: Check containers
 print_step "Checking blockchain containers..."
-for container in cli cli-cold peer0.lawenforcement.hot.coc.com peer0.forensiclab.hot.coc.com peer0.archive.cold.coc.com; do
+for container in cli cli-cold peer0.lawenforcement.hot.coc.com peer0.forensiclab.hot.coc.com peer0.auditor.cold.coc.com; do
     if docker ps --format '{{.Names}}' | grep -q "^${container}$"; then
         echo "✓ Container $container is running"
     else
@@ -177,8 +177,8 @@ docker exec cli-cold peer lifecycle chaincode commit \
     --name ${CC_NAME} \
     --version ${CC_VERSION} \
     --sequence ${CC_SEQUENCE} \
-    --peerAddresses peer0.archive.cold.coc.com:9051 \
-    --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/archive.cold.coc.com/peers/peer0.archive.cold.coc.com/tls/ca.crt
+    --peerAddresses peer0.auditor.cold.coc.com:9051 \
+    --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/auditor.cold.coc.com/peers/peer0.auditor.cold.coc.com/tls/ca.crt
 check_result "Committed to Cold blockchain"
 
 # Step 10: Initialize chaincode with PRV configuration from Enclave
@@ -225,8 +225,8 @@ docker exec cli-cold peer chaincode invoke \
     --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/cold.coc.com/orderers/orderer.cold.coc.com/msp/tlscacerts/tlsca.cold.coc.com-cert.pem \
     -C coldchannel \
     -n ${CC_NAME} \
-    --peerAddresses peer0.archive.cold.coc.com:9051 \
-    --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/archive.cold.coc.com/peers/peer0.archive.cold.coc.com/tls/ca.crt \
+    --peerAddresses peer0.auditor.cold.coc.com:9051 \
+    --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/auditor.cold.coc.com/peers/peer0.auditor.cold.coc.com/tls/ca.crt \
     -c "{\"function\":\"InitLedger\",\"Args\":[\"$PUBLIC_KEY\",\"$MRENCLAVE\",\"$MRSIGNER\"]}" \
     2>&1
 check_result "Cold blockchain initialized with enclave attestation"
