@@ -121,7 +121,7 @@ docker network connect fyp_dfir-network cli 2>/dev/null || echo "  Already conne
 # Join orderer to channel using osnadmin
 docker exec cli osnadmin channel join \
     --channelID hotchannel \
-    --config-block /opt/gopath/src/github.com/hyperledger/fabric/peer/hot-blockchain/channel-artifacts/hotchannel.block \
+    --config-block /opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts/hotchannel.block \
     -o orderer.hot.coc.com:7053 \
     --ca-file /opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/tls/ca.crt \
     --client-cert /opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/ordererOrganizations/hot.coc.com/orderers/orderer.hot.coc.com/tls/server.crt \
